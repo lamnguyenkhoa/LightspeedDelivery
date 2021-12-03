@@ -25,6 +25,13 @@ public class FPSController : MonoBehaviour
     public GameObject sunrayModel;
     public GameObject sunTrailPrefab;
 
+    public LineRenderer aimRenderer;
+
+    public float timeInSunrayForm = 0.5f;
+    public float timer;
+
+    private bool isAiming = false;
+
     public float maxFOV = 90f;
     private float startFOV;
 
@@ -41,6 +48,11 @@ public class FPSController : MonoBehaviour
         if (inSunrayForm)
         {
             mainCamera.fieldOfView = Mathf.Lerp(mainCamera.fieldOfView, maxFOV, 0.05f);
+            SunrayDash();
+            if (Time.time > timer + timeInSunrayForm)
+            {
+                HumanForm();
+            }
         }
         else
         {
@@ -68,11 +80,30 @@ public class FPSController : MonoBehaviour
                 velocity.y = Mathf.Sqrt(jumpHeight * -2f * gravity);
             }
 
-            // Sunray
+            // Aim Sunray
             if (Input.GetKeyDown(KeyCode.Mouse1))
             {
-                StopAllCoroutines();
-                StartCoroutine(SunrayDash());
+                isAiming = true;
+            }
+
+            // Cancel aiming
+            if (Input.GetKeyDown(KeyCode.F))
+            {
+                // Cancel aiming
+                isAiming = false;
+                aimRenderer.positionCount = 0;
+            }
+
+            // Render aiming sunray
+            RenderAiming();
+
+            // Use Sunray
+            if (Input.GetKeyUp(KeyCode.Mouse1) && isAiming)
+            {
+                SunrayForm();
+                aimRenderer.positionCount = 0;
+                isAiming = false;
+                timer = Time.time;
             }
 
             // Gravity
@@ -87,61 +118,19 @@ public class FPSController : MonoBehaviour
         }
     }
 
-    private void OnControllerColliderHit(ControllerColliderHit colliderHit)
+    private void RenderAiming()
     {
-        if (colliderHit.gameObject.tag == "Mirror")
+        if (isAiming)
         {
-            Debug.Log("Mirror");
-            RaycastHit hit;
-            if (Physics.Raycast(transform.position + transform.forward * 2, transform.forward,
-                    out hit, 20f, Physics.DefaultRaycastLayers, QueryTriggerInteraction.Ignore))
-            {
-                Vector3 inDirection = transform.forward;
-                Vector3 reflectDirection = Vector3.Reflect(inDirection, hit.normal);
-                transform.forward = reflectDirection.normalized;
-                StopAllCoroutines();
-                StartCoroutine(SunrayDash());
-                Debug.Log("Reflection direction: " + reflectDirection);
-            }
-        }
-        if (colliderHit.gameObject.tag == "SolarPanel")
-        {
-            Debug.Log("SolarPanel, died!");
+            List<Vector3> drawPoints = new List<Vector3>();
+            drawPoints.Add(transform.position);
+            MirrorRaycast(mainCamera.transform.position, mainCamera.transform.forward, new List<GameObject>(), drawPoints);
+            aimRenderer.positionCount = drawPoints.Count;
+            aimRenderer.SetPositions(drawPoints.ToArray());
         }
     }
 
-    private IEnumerator SunrayDash()
-    {
-        inSunrayForm = true;
-        sunrayModel.SetActive(true);
-        characterModel.SetActive(false);
-        controller.height = 0f;
-        controller.radius = 0.2f;
-
-        GameObject sunTrail = Instantiate(sunTrailPrefab, this.transform, true);
-        sunTrail.transform.localPosition = Vector3.zero;
-        float duration = 0.5f;
-        float timer = 0;
-        Physics.IgnoreLayerCollision(LayerMask.NameToLayer("Glass"), this.gameObject.layer, true);
-        while (timer < duration)
-        {
-            controller.Move(mainCamera.transform.forward * sunraySpeed * Time.deltaTime);
-            timer += Time.deltaTime;
-            yield return null;
-        }
-        Physics.IgnoreLayerCollision(LayerMask.NameToLayer("Glass"), this.gameObject.layer, false);
-        inSunrayForm = false;
-        sunrayModel.SetActive(false);
-        characterModel.SetActive(true);
-        controller.height = 2f;
-        controller.radius = 0.5f;
-        sunTrail.transform.parent = null;
-        yield return null;
-    }
-
-    /* https://www.youtube.com/watch?v=GttdLYKEJAM&ab_channel=WorldofZero */
-
-    private void DrawReflectDirectionDebug(Vector3 position, Vector3 direction, List<GameObject> bouncedMirror)
+    private void MirrorRaycast(Vector3 position, Vector3 direction, List<GameObject> bouncedMirror, List<Vector3> drawPoints)
     {
         Vector3 startingPosition = position;
         Ray ray = new Ray(position, direction);
@@ -169,19 +158,64 @@ public class FPSController : MonoBehaviour
         {
             position += direction * sunraySpeed;
         }
-
-        Gizmos.color = Color.yellow;
-        Gizmos.DrawLine(startingPosition, position);
+        drawPoints.Add(position);
 
         if (continueBounce)
         {
-            DrawReflectDirectionDebug(position, direction, bouncedMirror);
+            MirrorRaycast(position, direction, bouncedMirror, drawPoints);
         }
+    }
+
+    private void SunrayDash()
+    {
+        SunrayForm();
+        //GameObject sunTrail = Instantiate(sunTrailPrefab, this.transform, true);
+        //sunTrail.transform.localPosition = Vector3.zero;
+        controller.Move(mainCamera.transform.forward * sunraySpeed * Time.deltaTime);
+
+        // Check to see if in front of player is mirror
+        RaycastHit hit;
+        if (Physics.Raycast(transform.position, transform.forward,
+                out hit, 1f, Physics.DefaultRaycastLayers, QueryTriggerInteraction.Ignore))
+        {
+            if (hit.collider.gameObject.tag == "Mirror")
+            {
+                Vector3 inDirection = transform.forward;
+                Vector3 reflectDirection = Vector3.Reflect(inDirection, hit.normal);
+                transform.position = hit.point;
+                transform.forward = reflectDirection;
+                timer = Time.time;
+                Debug.Log("Reflection direction: " + reflectDirection);
+            }
+        }
+
+        //sunTrail.transform.parent = null;
+    }
+
+    private void SunrayForm()
+    {
+        inSunrayForm = true;
+        sunrayModel.SetActive(true);
+        characterModel.SetActive(false);
+        controller.height = 0f;
+        controller.radius = 0.2f;
+        Physics.IgnoreLayerCollision(LayerMask.NameToLayer("Glass"), this.gameObject.layer, true);
+    }
+
+    private void HumanForm()
+    {
+        inSunrayForm = false;
+        sunrayModel.SetActive(false);
+        characterModel.SetActive(true);
+        controller.height = 2f;
+        controller.radius = 0.5f;
+        Physics.IgnoreLayerCollision(LayerMask.NameToLayer("Glass"), this.gameObject.layer, false);
     }
 
     private void OnDrawGizmosSelected()
     {
         Gizmos.DrawWireSphere(groundCheck.position, 0.2f);
-        DrawReflectDirectionDebug(transform.position, transform.forward * 2, new List<GameObject>());
+        Gizmos.color = Color.red;
+        Gizmos.DrawRay(mainCamera.transform.position, mainCamera.transform.forward);
     }
 }
