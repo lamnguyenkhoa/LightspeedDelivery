@@ -11,6 +11,7 @@ public class FPSController : MonoBehaviour
     public float jumpHeight = 4f;
     private float gravity = -9.8f;
     public LayerMask groundMask;
+    public LayerMask glassMask;
     private float xRotation;
     private Vector3 move; // player controlled movement
     private Vector3 velocity; // environmental stuff affect player movement
@@ -92,12 +93,14 @@ public class FPSController : MonoBehaviour
         inSunrayForm = true;
         float duration = 0.5f;
         float timer = 0;
+        Physics.IgnoreLayerCollision(LayerMask.NameToLayer("Glass"), this.gameObject.layer, true);
         while (timer < duration)
         {
             controller.Move(mainCamera.transform.forward * sunraySpeed * Time.deltaTime);
             timer += Time.deltaTime;
             yield return null;
         }
+        Physics.IgnoreLayerCollision(LayerMask.NameToLayer("Glass"), this.gameObject.layer, false);
         inSunrayForm = false;
         yield return null;
     }
