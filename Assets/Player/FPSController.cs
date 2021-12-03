@@ -40,7 +40,7 @@ public class FPSController : MonoBehaviour
         }
         else
         {
-            mainCamera.fieldOfView = Mathf.Lerp(mainCamera.fieldOfView, startFOV, 0.1f);
+            mainCamera.fieldOfView = Mathf.Lerp(mainCamera.fieldOfView, startFOV, 0.01f);
 
             // Camera
             float mouseX = Input.GetAxis("Mouse X") * mouseSensitivity * Time.deltaTime;
