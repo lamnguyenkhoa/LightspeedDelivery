@@ -510,7 +510,6 @@ MonoBehaviour:
   mainCamera: {fileID: 3221472401123122976}
   moveSpeed: 7
   jumpHeight: 4
-  gravity: -9.8
   groundMask:
     serializedVersion: 2
     m_Bits: 640
