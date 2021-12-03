@@ -179,7 +179,7 @@ public class FPSController : MonoBehaviour
         }
     }
 
-    private void OnDrawGizmos()
+    private void OnDrawGizmosSelected()
     {
         Gizmos.DrawWireSphere(groundCheck.position, 0.2f);
         DrawReflectDirectionDebug(transform.position, transform.forward * 2, new List<GameObject>());
