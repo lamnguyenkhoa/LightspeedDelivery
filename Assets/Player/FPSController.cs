@@ -1,5 +1,6 @@
 using System.Collections;
 using System.Collections.Generic;
+using UnityEditor;
 using UnityEngine;
 
 public class FPSController : MonoBehaviour
@@ -20,6 +21,9 @@ public class FPSController : MonoBehaviour
     public Transform groundCheck;
     private bool inSunrayForm = false;
     public float sunraySpeed = 20f;
+    public GameObject characterModel;
+    public GameObject sunrayModel;
+    public GameObject sunTrailPrefab;
 
     public float maxFOV = 90f;
     private float startFOV;
@@ -36,11 +40,11 @@ public class FPSController : MonoBehaviour
     {
         if (inSunrayForm)
         {
-            mainCamera.fieldOfView = Mathf.Lerp(mainCamera.fieldOfView, maxFOV, 0.1f);
+            mainCamera.fieldOfView = Mathf.Lerp(mainCamera.fieldOfView, maxFOV, 0.05f);
         }
         else
         {
-            mainCamera.fieldOfView = Mathf.Lerp(mainCamera.fieldOfView, startFOV, 0.01f);
+            mainCamera.fieldOfView = Mathf.Lerp(mainCamera.fieldOfView, startFOV, 0.05f);
 
             // Camera
             float mouseX = Input.GetAxis("Mouse X") * mouseSensitivity * Time.deltaTime;
@@ -83,14 +87,39 @@ public class FPSController : MonoBehaviour
         }
     }
 
-    private void OnDrawGizmosSelected()
+    private void OnControllerColliderHit(ControllerColliderHit colliderHit)
     {
-        Gizmos.DrawWireSphere(groundCheck.position, 0.2f);
+        if (colliderHit.gameObject.tag == "Mirror")
+        {
+            Debug.Log("Mirror");
+            RaycastHit hit;
+            if (Physics.Raycast(transform.position + transform.forward * 2, transform.forward,
+                    out hit, 20f, Physics.DefaultRaycastLayers, QueryTriggerInteraction.Ignore))
+            {
+                Vector3 inDirection = transform.forward;
+                Vector3 reflectDirection = Vector3.Reflect(inDirection, hit.normal);
+                transform.forward = reflectDirection.normalized;
+                StopAllCoroutines();
+                StartCoroutine(SunrayDash());
+                Debug.Log("Reflection direction: " + reflectDirection);
+            }
+        }
+        if (colliderHit.gameObject.tag == "SolarPanel")
+        {
+            Debug.Log("SolarPanel, died!");
+        }
     }
 
     private IEnumerator SunrayDash()
     {
         inSunrayForm = true;
+        sunrayModel.SetActive(true);
+        characterModel.SetActive(false);
+        controller.height = 0f;
+        controller.radius = 0.2f;
+
+        GameObject sunTrail = Instantiate(sunTrailPrefab, this.transform, true);
+        sunTrail.transform.localPosition = Vector3.zero;
         float duration = 0.5f;
         float timer = 0;
         Physics.IgnoreLayerCollision(LayerMask.NameToLayer("Glass"), this.gameObject.layer, true);
@@ -102,6 +131,57 @@ public class FPSController : MonoBehaviour
         }
         Physics.IgnoreLayerCollision(LayerMask.NameToLayer("Glass"), this.gameObject.layer, false);
         inSunrayForm = false;
+        sunrayModel.SetActive(false);
+        characterModel.SetActive(true);
+        controller.height = 2f;
+        controller.radius = 0.5f;
+        sunTrail.transform.parent = null;
         yield return null;
+    }
+
+    /* https://www.youtube.com/watch?v=GttdLYKEJAM&ab_channel=WorldofZero */
+
+    private void DrawReflectDirectionDebug(Vector3 position, Vector3 direction, List<GameObject> bouncedMirror)
+    {
+        Vector3 startingPosition = position;
+        Ray ray = new Ray(position, direction);
+        RaycastHit hit;
+        bool continueBounce = false;
+
+        if (Physics.Raycast(ray, out hit, sunraySpeed))
+        {
+            if (hit.collider.gameObject.tag == "Mirror")
+            {
+                if (!bouncedMirror.Contains(hit.collider.gameObject))
+                {
+                    direction = Vector3.Reflect(direction, hit.normal);
+                    position = hit.point;
+                    bouncedMirror.Add(hit.collider.gameObject);
+                    continueBounce = true;
+                }
+            }
+            else
+            {
+                position = hit.point;
+            }
+        }
+        else
+        {
+            position += direction * sunraySpeed;
+        }
+
+        Gizmos.color = Color.yellow;
+        Gizmos.DrawLine(startingPosition, position);
+
+        if (continueBounce)
+        {
+            DrawReflectDirectionDebug(position, direction, bouncedMirror);
+        }
+    }
+
+    private void OnDrawGizmos()
+    {
+        Gizmos.DrawWireSphere(groundCheck.position, 0.2f);
+        DrawReflectDirectionDebug(transform.position, transform.forward * 2, new List<GameObject>());
     }
 }
