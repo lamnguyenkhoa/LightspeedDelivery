@@ -10,12 +10,13 @@ public class FPSController : MonoBehaviour
 
     public float moveSpeed = 7f;
     public float jumpHeight = 4f;
-    private float gravity = -9.8f;
+    public float gravity = -9.8f;
     public LayerMask groundMask;
     public LayerMask glassMask;
     private float xRotation;
     private Vector3 move; // player controlled movement
     private Vector3 velocity; // environmental stuff affect player movement
+    public Vector3 dashDirection; // environmental stuff affect player movement
     private CharacterController controller;
     public bool isGrounded = false;
     public Transform groundCheck;
@@ -48,7 +49,13 @@ public class FPSController : MonoBehaviour
         if (inSunrayForm)
         {
             mainCamera.fieldOfView = Mathf.Lerp(mainCamera.fieldOfView, maxFOV, 0.05f);
+            Vector3 cameraTmp = new Vector3(dashDirection.x, 0, 0);
+            Vector3 bodyTmp = new Vector3(0, dashDirection.y, 0);
+
+            mainCamera.transform.forward = Vector3.Lerp(mainCamera.transform.forward, dashDirection, 0.05f);
+
             SunrayDash();
+
             if (Time.time > timer + timeInSunrayForm)
             {
                 HumanForm();
@@ -123,7 +130,7 @@ public class FPSController : MonoBehaviour
         if (isAiming)
         {
             List<Vector3> drawPoints = new List<Vector3>();
-            drawPoints.Add(transform.position);
+            drawPoints.Add(aimRenderer.transform.position);
             MirrorRaycast(mainCamera.transform.position, mainCamera.transform.forward, new List<GameObject>(), drawPoints);
             aimRenderer.positionCount = drawPoints.Count;
             aimRenderer.SetPositions(drawPoints.ToArray());
@@ -137,7 +144,7 @@ public class FPSController : MonoBehaviour
         RaycastHit hit;
         bool continueBounce = false;
 
-        if (Physics.Raycast(ray, out hit, sunraySpeed))
+        if (Physics.Raycast(ray, out hit, sunraySpeed * timeInSunrayForm))
         {
             if (hit.collider.gameObject.tag == "Mirror")
             {
@@ -156,7 +163,7 @@ public class FPSController : MonoBehaviour
         }
         else
         {
-            position += direction * sunraySpeed;
+            position += direction * sunraySpeed * timeInSunrayForm;
         }
         drawPoints.Add(position);
 
@@ -168,24 +175,26 @@ public class FPSController : MonoBehaviour
 
     private void SunrayDash()
     {
-        SunrayForm();
         //GameObject sunTrail = Instantiate(sunTrailPrefab, this.transform, true);
         //sunTrail.transform.localPosition = Vector3.zero;
-        controller.Move(mainCamera.transform.forward * sunraySpeed * Time.deltaTime);
+        controller.Move(dashDirection * sunraySpeed * Time.deltaTime);
 
         // Check to see if in front of player is mirror
         RaycastHit hit;
-        if (Physics.Raycast(transform.position, transform.forward,
+        if (Physics.Raycast(transform.position, dashDirection,
                 out hit, 1f, Physics.DefaultRaycastLayers, QueryTriggerInteraction.Ignore))
         {
             if (hit.collider.gameObject.tag == "Mirror")
             {
-                Vector3 inDirection = transform.forward;
-                Vector3 reflectDirection = Vector3.Reflect(inDirection, hit.normal);
+                Vector3 reflectDirection = Vector3.Reflect(dashDirection, hit.normal);
                 transform.position = hit.point;
-                transform.forward = reflectDirection;
+                dashDirection = reflectDirection;
                 timer = Time.time;
                 Debug.Log("Reflection direction: " + reflectDirection);
+            }
+            else if (hit.collider.gameObject.layer == LayerMask.NameToLayer("Glass"))
+            {
+                // Do nothing
             }
         }
 
@@ -194,6 +203,7 @@ public class FPSController : MonoBehaviour
 
     private void SunrayForm()
     {
+        dashDirection = mainCamera.transform.forward;
         inSunrayForm = true;
         sunrayModel.SetActive(true);
         characterModel.SetActive(false);
@@ -204,6 +214,12 @@ public class FPSController : MonoBehaviour
 
     private void HumanForm()
     {
+        xRotation = mainCamera.transform.localEulerAngles.x;
+        if (xRotation > 90)
+        {
+            xRotation = xRotation - 360f;
+        }
+        transform.Rotate(Vector3.up * mainCamera.transform.localEulerAngles.y);
         inSunrayForm = false;
         sunrayModel.SetActive(false);
         characterModel.SetActive(true);
