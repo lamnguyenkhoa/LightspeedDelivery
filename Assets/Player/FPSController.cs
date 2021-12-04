@@ -49,10 +49,26 @@ public class FPSController : MonoBehaviour
         if (inSunrayForm)
         {
             mainCamera.fieldOfView = Mathf.Lerp(mainCamera.fieldOfView, maxFOV, 0.05f);
-            Vector3 cameraTmp = new Vector3(dashDirection.x, 0, 0);
-            Vector3 bodyTmp = new Vector3(0, dashDirection.y, 0);
 
-            mainCamera.transform.forward = Vector3.Lerp(mainCamera.transform.forward, dashDirection, 0.05f);
+            //mainCamera.transform.forward = Vector3.Lerp(mainCamera.transform.forward, dashDirection, 0.05f);
+
+            Vector3 dashEulerRotation = Quaternion.LookRotation(dashDirection).eulerAngles;
+            // Update xRotation so when player go back to Human Form it doesn't reset the camera
+            // rotation
+            xRotation = dashEulerRotation.x;
+            if (xRotation > 90)
+            {
+                xRotation = xRotation - 360f;
+            }
+
+            // Smooth rotate these 2 value so player dont feel nauseous
+            Quaternion bodyRotation = Quaternion.Euler(new Vector3(0, dashEulerRotation.y, 0));
+            Quaternion cameraRotation = Quaternion.Euler(new Vector3(xRotation, 0, 0));
+
+            transform.rotation = Quaternion.Lerp(transform.rotation, bodyRotation, 0.05f);
+            mainCamera.transform.localRotation = Quaternion.Lerp(mainCamera.transform.localRotation, cameraRotation, 0.05f);
+
+            Debug.Log(dashEulerRotation);
 
             SunrayDash();
 
@@ -190,7 +206,6 @@ public class FPSController : MonoBehaviour
                 transform.position = hit.point;
                 dashDirection = reflectDirection;
                 timer = Time.time;
-                Debug.Log("Reflection direction: " + reflectDirection);
             }
             else if (hit.collider.gameObject.layer == LayerMask.NameToLayer("Glass"))
             {
@@ -214,12 +229,6 @@ public class FPSController : MonoBehaviour
 
     private void HumanForm()
     {
-        xRotation = mainCamera.transform.localEulerAngles.x;
-        if (xRotation > 90)
-        {
-            xRotation = xRotation - 360f;
-        }
-        transform.Rotate(Vector3.up * mainCamera.transform.localEulerAngles.y);
         inSunrayForm = false;
         sunrayModel.SetActive(false);
         characterModel.SetActive(true);
