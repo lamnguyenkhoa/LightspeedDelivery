@@ -1,7 +1,9 @@
+using System;
 using System.Collections;
 using System.Collections.Generic;
 using UnityEditor;
 using UnityEngine;
+using UnityEngine.UI;
 
 public class FPSController : MonoBehaviour
 {
@@ -9,6 +11,7 @@ public class FPSController : MonoBehaviour
     public Camera mainCamera;
 
     public float moveSpeed = 7f;
+    public float sprintSpeed = 12f;
     public float jumpHeight = 4f;
     public float gravity = -9.8f;
     public LayerMask groundMask;
@@ -33,6 +36,14 @@ public class FPSController : MonoBehaviour
     public float timeInSunrayForm = 0.5f;
     private float timer;
 
+    public float maxStamina = 100f;
+    private float currentStamina;
+    public Slider staminaSlider;
+    private bool isRunning;
+    public float runStaminaCost = 5f;
+    public float dashStaminaCost = 30f;
+    public float staminaRecovery = 10f;
+
     private bool isAiming = false;
 
     public float maxFOV = 90f;
@@ -44,6 +55,7 @@ public class FPSController : MonoBehaviour
         Cursor.lockState = CursorLockMode.Locked;
         velocity = Vector3.zero;
         startFOV = mainCamera.fieldOfView;
+        currentStamina = maxStamina;
     }
 
     private void Update()
@@ -91,10 +103,26 @@ public class FPSController : MonoBehaviour
             transform.Rotate(Vector3.up * mouseX);
 
             // Movement
-            float x = Input.GetAxisRaw("Horizontal");
-            float z = Input.GetAxisRaw("Vertical");
+            float xInput = Input.GetAxisRaw("Horizontal");
+            float zInput = Input.GetAxisRaw("Vertical");
 
-            move = (x * transform.right + z * transform.forward) * moveSpeed;
+            if (Input.GetKey(KeyCode.LeftShift))
+            {
+                isRunning = true;
+            }
+            else
+            {
+                isRunning = false;
+            }
+
+            if (isRunning)
+            {
+                move = (xInput * transform.right + zInput * transform.forward) * sprintSpeed;
+            }
+            else
+            {
+                move = (xInput * transform.right + zInput * transform.forward) * moveSpeed;
+            }
             controller.Move(move * Time.deltaTime);
 
             // Jump
@@ -123,10 +151,20 @@ public class FPSController : MonoBehaviour
             // Use Sunray
             if (Input.GetKeyUp(KeyCode.Mouse1) && isAiming)
             {
-                SunrayForm();
-                aimRenderer.positionCount = 0;
-                isAiming = false;
-                timer = Time.time;
+                if (currentStamina >= dashStaminaCost)
+                {
+                    currentStamina -= dashStaminaCost;
+                    SunrayForm();
+                    aimRenderer.positionCount = 0;
+                    isAiming = false;
+                    timer = Time.time;
+                }
+                else
+                {
+                    isAiming = false;
+                    aimRenderer.positionCount = 0;
+                    Debug.Log("Not enough stamina");
+                }
             }
 
             // Gravity
@@ -138,7 +176,84 @@ public class FPSController : MonoBehaviour
             velocity.y += gravity * Time.deltaTime;
 
             controller.Move(velocity * Time.deltaTime);
+
+            // Stamina management
+            if (isRunning && move != Vector3.zero)
+            {
+                currentStamina -= runStaminaCost * Time.deltaTime;
+            }
+            else
+            {
+                currentStamina += staminaRecovery * Time.deltaTime;
+            }
         }
+
+        UpdateGUI();
+    }
+
+    private void UpdateGUI()
+    {
+        currentStamina = Mathf.Clamp(currentStamina, 0, currentStamina);
+        staminaSlider.value = currentStamina / maxStamina;
+    }
+
+    private void SunrayDash()
+    {
+        //GameObject sunTrail = Instantiate(sunTrailPrefab, this.transform, true);
+        //sunTrail.transform.localPosition = Vector3.zero;
+        controller.Move(dashDirection * sunraySpeed * Time.deltaTime);
+
+        // Check to see if in front of player is mirror
+        RaycastHit hit;
+        if (Physics.Raycast(transform.position, dashDirection,
+                out hit, 0.5f, Physics.DefaultRaycastLayers, QueryTriggerInteraction.Ignore))
+        {
+            if (hit.collider.gameObject.tag == "Mirror")
+            {
+                Vector3 reflectDirection = Vector3.Reflect(dashDirection, hit.normal);
+                transform.position = hit.point;
+                dashDirection = reflectDirection;
+                timer = Time.time;
+            }
+            else if (hit.collider.gameObject.layer == LayerMask.NameToLayer("Glass"))
+            {
+                // Do nothing
+            }
+            else if (hit.collider.gameObject.tag == "SolarPanel")
+            {
+                Debug.Log("You died!");
+            }
+            else
+            {
+                HumanForm();
+            }
+        }
+
+        //sunTrail.transform.parent = null;
+    }
+
+    private void SunrayForm()
+    {
+        dashDirection = mainCamera.transform.forward;
+        inSunrayForm = true;
+        sunrayModel.SetActive(true);
+        characterModel.SetActive(false);
+        controller.height = 0f;
+        controller.radius = 0.2f;
+        Physics.IgnoreLayerCollision(LayerMask.NameToLayer("Glass"), this.gameObject.layer, true);
+    }
+
+    private void HumanForm()
+    {
+        if (resetCameraAfterDash)
+            xRotation = 0f;
+        velocity = Vector3.zero;
+        inSunrayForm = false;
+        sunrayModel.SetActive(false);
+        characterModel.SetActive(true);
+        controller.height = 2f;
+        controller.radius = 0.5f;
+        Physics.IgnoreLayerCollision(LayerMask.NameToLayer("Glass"), this.gameObject.layer, false);
     }
 
     private void RenderAiming()
@@ -187,57 +302,6 @@ public class FPSController : MonoBehaviour
         {
             MirrorRaycast(position, direction, bouncedMirror, drawPoints);
         }
-    }
-
-    private void SunrayDash()
-    {
-        //GameObject sunTrail = Instantiate(sunTrailPrefab, this.transform, true);
-        //sunTrail.transform.localPosition = Vector3.zero;
-        controller.Move(dashDirection * sunraySpeed * Time.deltaTime);
-
-        // Check to see if in front of player is mirror
-        RaycastHit hit;
-        if (Physics.Raycast(transform.position, dashDirection,
-                out hit, 1f, Physics.DefaultRaycastLayers, QueryTriggerInteraction.Ignore))
-        {
-            if (hit.collider.gameObject.tag == "Mirror")
-            {
-                Vector3 reflectDirection = Vector3.Reflect(dashDirection, hit.normal);
-                transform.position = hit.point;
-                dashDirection = reflectDirection;
-                timer = Time.time;
-            }
-            else if (hit.collider.gameObject.layer == LayerMask.NameToLayer("Glass"))
-            {
-                // Do nothing
-            }
-        }
-
-        //sunTrail.transform.parent = null;
-    }
-
-    private void SunrayForm()
-    {
-        dashDirection = mainCamera.transform.forward;
-        inSunrayForm = true;
-        sunrayModel.SetActive(true);
-        characterModel.SetActive(false);
-        controller.height = 0f;
-        controller.radius = 0.2f;
-        Physics.IgnoreLayerCollision(LayerMask.NameToLayer("Glass"), this.gameObject.layer, true);
-    }
-
-    private void HumanForm()
-    {
-        if (resetCameraAfterDash)
-            xRotation = 0f;
-        velocity = Vector3.zero;
-        inSunrayForm = false;
-        sunrayModel.SetActive(false);
-        characterModel.SetActive(true);
-        controller.height = 2f;
-        controller.radius = 0.5f;
-        Physics.IgnoreLayerCollision(LayerMask.NameToLayer("Glass"), this.gameObject.layer, false);
     }
 
     private void OnDrawGizmosSelected()
