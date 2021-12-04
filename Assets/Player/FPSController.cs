@@ -16,7 +16,7 @@ public class FPSController : MonoBehaviour
     private float xRotation;
     private Vector3 move; // player controlled movement
     private Vector3 velocity; // environmental stuff affect player movement
-    public Vector3 dashDirection; // environmental stuff affect player movement
+    private Vector3 dashDirection;
     private CharacterController controller;
     public bool isGrounded = false;
     public Transform groundCheck;
@@ -28,8 +28,10 @@ public class FPSController : MonoBehaviour
 
     public LineRenderer aimRenderer;
 
+    public bool resetCameraAfterDash = false;
+
     public float timeInSunrayForm = 0.5f;
-    public float timer;
+    private float timer;
 
     private bool isAiming = false;
 
@@ -65,10 +67,8 @@ public class FPSController : MonoBehaviour
             Quaternion bodyRotation = Quaternion.Euler(new Vector3(0, dashEulerRotation.y, 0));
             Quaternion cameraRotation = Quaternion.Euler(new Vector3(xRotation, 0, 0));
 
-            transform.rotation = Quaternion.Lerp(transform.rotation, bodyRotation, 0.05f);
-            mainCamera.transform.localRotation = Quaternion.Lerp(mainCamera.transform.localRotation, cameraRotation, 0.05f);
-
-            Debug.Log(dashEulerRotation);
+            transform.rotation = Quaternion.Lerp(transform.rotation, bodyRotation, 0.1f);
+            mainCamera.transform.localRotation = Quaternion.Lerp(mainCamera.transform.localRotation, cameraRotation, 0.1f);
 
             SunrayDash();
 
@@ -87,7 +87,7 @@ public class FPSController : MonoBehaviour
 
             xRotation -= mouseY;
             xRotation = Mathf.Clamp(xRotation, -90f, 90f);
-            mainCamera.transform.localRotation = Quaternion.Euler(xRotation, 0f, 0f);
+            mainCamera.transform.localRotation = Quaternion.Slerp(mainCamera.transform.localRotation, Quaternion.Euler(xRotation, 0f, 0f), 0.05f);
             transform.Rotate(Vector3.up * mouseX);
 
             // Movement
@@ -229,6 +229,9 @@ public class FPSController : MonoBehaviour
 
     private void HumanForm()
     {
+        if (resetCameraAfterDash)
+            xRotation = 0f;
+        velocity = Vector3.zero;
         inSunrayForm = false;
         sunrayModel.SetActive(false);
         characterModel.SetActive(true);
