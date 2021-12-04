@@ -99,7 +99,7 @@ public class FPSController : MonoBehaviour
 
             xRotation -= mouseY;
             xRotation = Mathf.Clamp(xRotation, -90f, 90f);
-            mainCamera.transform.localRotation = Quaternion.Slerp(mainCamera.transform.localRotation, Quaternion.Euler(xRotation, 0f, 0f), 0.05f);
+            mainCamera.transform.localRotation = Quaternion.Slerp(mainCamera.transform.localRotation, Quaternion.Euler(xRotation, 0f, 0f), 0.2f);
             transform.Rotate(Vector3.up * mouseX);
 
             // Movement
