@@ -193,7 +193,8 @@ public class FPSController : MonoBehaviour
 
     private void UpdateGUI()
     {
-        currentStamina = Mathf.Clamp(currentStamina, 0, currentStamina);
+        // Also prevent currentStamina to overload
+        currentStamina = Mathf.Clamp(currentStamina, 0, maxStamina);
         staminaSlider.value = currentStamina / maxStamina;
     }
 
