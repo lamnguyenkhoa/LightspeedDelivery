@@ -99,7 +99,7 @@ public class FPSController : MonoBehaviour
 
             xRotation -= mouseY;
             xRotation = Mathf.Clamp(xRotation, -90f, 90f);
-            mainCamera.transform.localRotation = Quaternion.Slerp(mainCamera.transform.localRotation, Quaternion.Euler(xRotation, 0f, 0f), 0.2f);
+            mainCamera.transform.localRotation = Quaternion.Euler(xRotation, 0, 0);
             transform.Rotate(Vector3.up * mouseX);
 
             // Movement
@@ -107,35 +107,23 @@ public class FPSController : MonoBehaviour
             float zInput = Input.GetAxisRaw("Vertical");
 
             if (Input.GetKey(KeyCode.LeftShift))
-            {
                 isRunning = true;
-            }
             else
-            {
                 isRunning = false;
-            }
 
             if (isRunning)
-            {
                 move = (xInput * transform.right + zInput * transform.forward) * sprintSpeed;
-            }
             else
-            {
                 move = (xInput * transform.right + zInput * transform.forward) * moveSpeed;
-            }
             controller.Move(move * Time.deltaTime);
 
             // Jump
             if (Input.GetKeyDown(KeyCode.Space) && isGrounded)
-            {
                 velocity.y = Mathf.Sqrt(jumpHeight * -2f * gravity);
-            }
 
             // Aim Sunray
             if (Input.GetKeyDown(KeyCode.Mouse1))
-            {
                 isAiming = true;
-            }
 
             // Cancel aiming
             if (Input.GetKeyDown(KeyCode.F))
@@ -247,7 +235,10 @@ public class FPSController : MonoBehaviour
     private void HumanForm()
     {
         if (resetCameraAfterDash)
-            xRotation = 0f;
+        {
+            StopAllCoroutines();
+            StartCoroutine(SmoothResetCameraAfterDash());
+        }
         velocity = Vector3.zero;
         inSunrayForm = false;
         sunrayModel.SetActive(false);
@@ -310,5 +301,18 @@ public class FPSController : MonoBehaviour
         Gizmos.DrawWireSphere(groundCheck.position, 0.2f);
         Gizmos.color = Color.red;
         Gizmos.DrawRay(mainCamera.transform.position, mainCamera.transform.forward);
+    }
+
+    private IEnumerator SmoothResetCameraAfterDash()
+    {
+        float resetDuration = 0.2f;
+        float timer = 0f;
+        while (timer < resetDuration)
+        {
+            timer += Time.deltaTime;
+            xRotation = Mathf.Lerp(xRotation, 0f, 0.08f);
+            yield return null;
+        }
+        yield return null;
     }
 }
