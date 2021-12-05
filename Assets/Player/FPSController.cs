@@ -53,8 +53,10 @@ public class FPSController : MonoBehaviour
 
     public GameObject foodGun;
     public FoodBagScript foodBagPrefab;
-    public float shootForce = 10f;
+    private float currentShootForce = 0f;
+    public float maxShootForce = 30f;
     public int currentFoodBag = 3;
+    public Slider shootForceSlider;
 
     private void Start()
     {
@@ -187,12 +189,24 @@ public class FPSController : MonoBehaviour
             }
 
             // Shoot food bag
-            if (Input.GetKeyDown(KeyCode.Mouse0))
+            // Hold LMB to charge
+            if (Input.GetKey(KeyCode.Mouse0))
             {
-                FoodBagScript newFoodBag = Instantiate(foodBagPrefab, foodGun.transform.position, Quaternion.identity);
-                newFoodBag.shootDirection = mainCamera.transform.forward;
-                newFoodBag.shootForce = shootForce;
-                currentFoodBag--;
+                currentShootForce += 10f * Time.deltaTime;
+                currentShootForce = Mathf.Clamp(currentShootForce, 0, maxShootForce);
+            }
+
+            if (Input.GetKeyUp(KeyCode.Mouse0))
+            {
+                if (currentShootForce >= 2.5f)
+                {
+                    FoodBagScript newFoodBag = Instantiate(foodBagPrefab, foodGun.transform.position, Quaternion.identity);
+                    newFoodBag.shootDirection = mainCamera.transform.forward;
+                    newFoodBag.shootForce = currentShootForce;
+                    Debug.Log("Shoot with " + currentShootForce + " force");
+                    currentFoodBag--;
+                }
+                currentShootForce = 0f;
             }
 
             // Stamina management
@@ -210,6 +224,7 @@ public class FPSController : MonoBehaviour
         // Also prevent currentStamina from going beyond maxStamina
         currentStamina = Mathf.Clamp(currentStamina, 0, maxStamina);
         staminaSlider.value = currentStamina / maxStamina;
+        shootForceSlider.value = currentShootForce / maxShootForce;
     }
 
     private void SunrayDash()
