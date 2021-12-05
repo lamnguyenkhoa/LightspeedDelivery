@@ -19,7 +19,7 @@ public class FPSController : MonoBehaviour
     public LayerMask glassMask;
     private float xRotation;
     private Vector3 move; // player controlled movement
-    private Vector3 velocity; // environmental stuff affect player movement
+    public Vector3 velocity; // environmental stuff affect player movement
     private Vector3 dashDirection;
     private CharacterController controller;
 
@@ -50,6 +50,11 @@ public class FPSController : MonoBehaviour
 
     public float maxFOV = 90f;
     private float startFOV;
+
+    public GameObject foodGun;
+    public FoodBagScript foodBagPrefab;
+    public float shootForce = 10f;
+    public int currentFoodBag = 3;
 
     private void Start()
     {
@@ -121,9 +126,11 @@ public class FPSController : MonoBehaviour
 
             // Gravity
             // For some reason, the built-in controller.isGrounded only work if
-            // we check gravity before the Jump check
+            // move the character controller downward first
             //isGrounded = Physics.CheckSphere(groundCheck.position, 0.4f, groundMask);
-            if (controller.isGrounded && velocity.y < 0)
+            velocity.y += gravity * Time.deltaTime;
+            controller.Move(velocity * Time.deltaTime);
+            if (controller.isGrounded)
             {
                 if (velocity.y < 0)
                 {
@@ -140,8 +147,6 @@ public class FPSController : MonoBehaviour
                 // near an wall's edge
                 controller.stepOffset = 0f;
             }
-            velocity.y += gravity * Time.deltaTime;
-            controller.Move(velocity * Time.deltaTime);
 
             // Jump
             if (Input.GetKeyDown(KeyCode.Space) && controller.isGrounded)
@@ -179,6 +184,15 @@ public class FPSController : MonoBehaviour
                     aimRenderer.positionCount = 0;
                     Debug.Log("Not enough stamina");
                 }
+            }
+
+            // Shoot food bag
+            if (Input.GetKeyDown(KeyCode.Mouse0))
+            {
+                FoodBagScript newFoodBag = Instantiate(foodBagPrefab, foodGun.transform.position, Quaternion.identity);
+                newFoodBag.shootDirection = mainCamera.transform.forward;
+                newFoodBag.shootForce = shootForce;
+                currentFoodBag--;
             }
 
             // Stamina management
