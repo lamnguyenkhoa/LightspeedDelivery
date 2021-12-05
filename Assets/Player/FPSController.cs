@@ -14,15 +14,17 @@ public class FPSController : MonoBehaviour
     public float sprintSpeed = 12f;
     public float jumpHeight = 4f;
     public float gravity = -9.8f;
-    public LayerMask groundMask;
+
+    //public LayerMask groundMask;
     public LayerMask glassMask;
     private float xRotation;
     private Vector3 move; // player controlled movement
     private Vector3 velocity; // environmental stuff affect player movement
     private Vector3 dashDirection;
     private CharacterController controller;
-    public bool isGrounded = false;
-    public Transform groundCheck;
+
+    //public bool isGrounded = false;
+    //public Transform groundCheck;
     private bool inSunrayForm = false;
     public float sunraySpeed = 20f;
     public GameObject characterModel;
@@ -117,8 +119,32 @@ public class FPSController : MonoBehaviour
                 move = (xInput * transform.right + zInput * transform.forward) * moveSpeed;
             controller.Move(move * Time.deltaTime);
 
+            // Gravity
+            // For some reason, the built-in controller.isGrounded only work if
+            // we check gravity before the Jump check
+            //isGrounded = Physics.CheckSphere(groundCheck.position, 0.4f, groundMask);
+            if (controller.isGrounded && velocity.y < 0)
+            {
+                if (velocity.y < 0)
+                {
+                    // The velocty.y need to be negative so controller.isGrounded
+                    // work properly
+                    velocity.y = -2f;
+                    // Reset step offset
+                    controller.stepOffset = 0.3f;
+                }
+            }
+            else
+            {
+                // Prevent character jittering when jump and move forward
+                // near an wall's edge
+                controller.stepOffset = 0f;
+            }
+            velocity.y += gravity * Time.deltaTime;
+            controller.Move(velocity * Time.deltaTime);
+
             // Jump
-            if (Input.GetKeyDown(KeyCode.Space) && isGrounded)
+            if (Input.GetKeyDown(KeyCode.Space) && controller.isGrounded)
                 velocity.y = Mathf.Sqrt(jumpHeight * -2f * gravity);
 
             // Aim Sunray
@@ -155,25 +181,11 @@ public class FPSController : MonoBehaviour
                 }
             }
 
-            // Gravity
-            isGrounded = Physics.CheckSphere(groundCheck.position, 0.2f, groundMask);
-            if (isGrounded && velocity.y < 0)
-            {
-                velocity.y = -2f;
-            }
-            velocity.y += gravity * Time.deltaTime;
-
-            controller.Move(velocity * Time.deltaTime);
-
             // Stamina management
             if (isRunning && move != Vector3.zero)
-            {
                 currentStamina -= runStaminaCost * Time.deltaTime;
-            }
             else
-            {
                 currentStamina += staminaRecovery * Time.deltaTime;
-            }
         }
 
         UpdateGUI();
@@ -181,7 +193,7 @@ public class FPSController : MonoBehaviour
 
     private void UpdateGUI()
     {
-        // Also prevent currentStamina to overload
+        // Also prevent currentStamina from going beyond maxStamina
         currentStamina = Mathf.Clamp(currentStamina, 0, maxStamina);
         staminaSlider.value = currentStamina / maxStamina;
     }
@@ -298,7 +310,7 @@ public class FPSController : MonoBehaviour
 
     private void OnDrawGizmosSelected()
     {
-        Gizmos.DrawWireSphere(groundCheck.position, 0.2f);
+        //Gizmos.DrawWireSphere(groundCheck.position, 0.4f);
         Gizmos.color = Color.red;
         Gizmos.DrawRay(mainCamera.transform.position, mainCamera.transform.forward);
     }
