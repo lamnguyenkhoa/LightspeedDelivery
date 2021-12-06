@@ -63,6 +63,10 @@ public class FPSController : MonoBehaviour
     public int currentFoodBag = 3;
     public Slider shootForceSlider;
 
+    private float amplitude = 0.015f;
+    private float frequency = 10f;
+    private Vector3 startCameraPos;
+
     private void Start()
     {
         controller = transform.GetComponent<CharacterController>();
@@ -70,6 +74,7 @@ public class FPSController : MonoBehaviour
         velocity = Vector3.zero;
         startFOV = mainCamera.fieldOfView;
         currentStamina = maxStamina;
+        startCameraPos = mainCamera.transform.localPosition;
     }
 
     private void Update()
@@ -140,6 +145,8 @@ public class FPSController : MonoBehaviour
                 // near an wall's edge
                 controller.stepOffset = 0f;
             }
+
+            HeadBob();
 
             // Jump
             if (Input.GetKeyDown(KeyCode.Space) && controller.isGrounded)
@@ -222,11 +229,15 @@ public class FPSController : MonoBehaviour
         {
             isRunning = true;
             currentSpeed = sprintSpeed;
+            frequency = 20f;
+            amplitude = 2f;
         }
         else
         {
             isRunning = false;
             currentSpeed = moveSpeed;
+            amplitude = 1f;
+            frequency = 10f;
         }
 
         // Directional modifier
@@ -238,6 +249,24 @@ public class FPSController : MonoBehaviour
         smoothSpeed = Mathf.Lerp(smoothSpeed, currentSpeed, Time.deltaTime * 5f);
         finalMove = (smoothMove.x * transform.right + smoothMove.z * transform.forward) * smoothSpeed;
         controller.Move(finalMove * Time.deltaTime);
+    }
+
+    private void HeadBob()
+    {
+        if (finalMove.magnitude < 8f || !controller.isGrounded)
+        {
+            // Reset position
+            if (mainCamera.transform.localPosition == startCameraPos) return;
+            mainCamera.transform.localPosition = Vector3.Lerp(mainCamera.transform.localPosition, startCameraPos, 5 * Time.deltaTime);
+        }
+        else
+        {
+            Vector3 headbobPos = Vector3.zero;
+            headbobPos.y += Mathf.Sin(Time.time * frequency) * amplitude;
+            headbobPos.x += Mathf.Sin(Time.time * frequency / 2) * amplitude;
+
+            mainCamera.transform.localPosition += headbobPos * Time.deltaTime;
+        }
     }
 
     private void UpdateGUI()
