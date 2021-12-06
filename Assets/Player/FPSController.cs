@@ -12,13 +12,18 @@ public class FPSController : MonoBehaviour
 
     public float moveSpeed = 7f;
     public float sprintSpeed = 12f;
+    public float currentSpeed;
+    public float smoothSpeed;
     public float jumpHeight = 4f;
     public float gravity = -9.8f;
 
     //public LayerMask groundMask;
     public LayerMask glassMask;
     private float xRotation;
-    private Vector3 move; // player controlled movement
+    public Vector3 move; // player controlled movement
+    public Vector3 smoothMove;
+    public Vector3 finalMove;
+
     public Vector3 velocity; // environmental stuff affect player movement
     private Vector3 dashDirection;
     private CharacterController controller;
@@ -111,21 +116,7 @@ public class FPSController : MonoBehaviour
             mainCamera.transform.localRotation = Quaternion.Euler(xRotation, 0, 0);
             transform.Rotate(Vector3.up * mouseX);
 
-            // Movement
-            float xInput = Input.GetAxisRaw("Horizontal");
-            float zInput = Input.GetAxisRaw("Vertical");
-
-            if (Input.GetKey(KeyCode.LeftShift))
-                isRunning = true;
-            else
-                isRunning = false;
-
-            if (isRunning)
-                move = (xInput * transform.right + zInput * transform.forward) * sprintSpeed;
-            else
-                move = (xInput * transform.right + zInput * transform.forward) * moveSpeed;
-            controller.Move(move * Time.deltaTime);
-
+            HandleMovement();
             // Gravity
             // For some reason, the built-in controller.isGrounded only work if
             // move the character controller downward first
@@ -203,6 +194,8 @@ public class FPSController : MonoBehaviour
                     FoodBagScript newFoodBag = Instantiate(foodBagPrefab, foodGun.transform.position, Quaternion.identity);
                     newFoodBag.shootDirection = mainCamera.transform.forward;
                     newFoodBag.shootForce = currentShootForce;
+                    // not all momentum yet, only player "active" momentum
+                    newFoodBag.bonusFromPlayerMomentum = finalMove;
                     Debug.Log("Shoot with " + currentShootForce + " force");
                     currentFoodBag--;
                 }
@@ -217,6 +210,34 @@ public class FPSController : MonoBehaviour
         }
 
         UpdateGUI();
+    }
+
+    private void HandleMovement()
+    {
+        // Movement
+        move = new Vector3(Input.GetAxisRaw("Horizontal"), 0, Input.GetAxisRaw("Vertical"));
+        smoothMove = Vector3.Lerp(smoothMove, move, Time.deltaTime * 5f);
+
+        if (Input.GetKey(KeyCode.LeftShift))
+        {
+            isRunning = true;
+            currentSpeed = sprintSpeed;
+        }
+        else
+        {
+            isRunning = false;
+            currentSpeed = moveSpeed;
+        }
+
+        // Directional modifier
+        if (move.x != 0 && move.z == 0)
+            currentSpeed *= 0.75f;
+        if (move.z == -1)
+            currentSpeed *= 0.5f;
+
+        smoothSpeed = Mathf.Lerp(smoothSpeed, currentSpeed, Time.deltaTime * 5f);
+        finalMove = (smoothMove.x * transform.right + smoothMove.z * transform.forward) * smoothSpeed;
+        controller.Move(finalMove * Time.deltaTime);
     }
 
     private void UpdateGUI()

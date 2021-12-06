@@ -10,11 +10,14 @@ public class FoodBagScript : MonoBehaviour
     [HideInInspector]
     public float shootForce;
 
+    [HideInInspector]
+    public Vector3 bonusFromPlayerMomentum;
+
     private Rigidbody rb;
 
     private void Start()
     {
         rb = GetComponent<Rigidbody>();
-        rb.AddForce(shootDirection * shootForce, ForceMode.Impulse);
+        rb.AddForce(shootDirection * shootForce + bonusFromPlayerMomentum, ForceMode.Impulse);
     }
 }
