@@ -6,6 +6,7 @@ TagManager:
   tags:
   - Mirror
   - SolarPanel
+  - Plant
   layers:
   - Default
   - TransparentFX

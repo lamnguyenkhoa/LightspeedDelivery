@@ -31,6 +31,7 @@ public class FPSController : MonoBehaviour
 
     //public bool isGrounded = false;
     //public Transform groundCheck;
+    private bool reliableIsGrouned; // because controller.isGrounded is damn unreliable
     private bool inSunrayForm = false;
     public float sunraySpeed = 20f;
     public GameObject characterModel;
@@ -48,9 +49,8 @@ public class FPSController : MonoBehaviour
     private float currentStamina;
     public Slider staminaSlider;
     private bool isRunning;
-    public float runStaminaCost = 5f;
-    public float dashStaminaCost = 30f;
-    public float staminaRecovery = 10f;
+    public float dashStaminaCost = 25f;
+    private float staminaRecovery = 50f;
 
     private bool isAiming = false;
 
@@ -66,9 +66,12 @@ public class FPSController : MonoBehaviour
     public int currentFoodBag = 3;
     public Slider shootForceSlider;
 
-    private float amplitude = 0.015f;
-    private float frequency = 10f;
+    private float amplitude;
+    private float frequency;
     private Vector3 startCameraPos;
+
+    [HideInInspector]
+    public int nPlantInRange = 0; // Use int instead of bool to prevent edge case bug
 
     private void Start()
     {
@@ -76,8 +79,9 @@ public class FPSController : MonoBehaviour
         Cursor.lockState = CursorLockMode.Locked;
         velocity = Vector3.zero;
         startFOV = mainCamera.fieldOfView;
-        currentStamina = maxStamina;
+        currentStamina = 0f;
         startCameraPos = mainCamera.transform.localPosition;
+        nPlantInRange = 0;
     }
 
     private void Update()
@@ -130,9 +134,10 @@ public class FPSController : MonoBehaviour
             // move the character controller downward first
             //isGrounded = Physics.CheckSphere(groundCheck.position, 0.4f, groundMask);
             velocity.y += gravity * Time.deltaTime;
-            velocity.y = Mathf.Clamp(velocity.y, maxGravity, -2f);
+            velocity.y = Mathf.Clamp(velocity.y, maxGravity, float.MaxValue);
             controller.Move(velocity * Time.deltaTime);
-            if (controller.isGrounded)
+            reliableIsGrouned = controller.isGrounded;
+            if (reliableIsGrouned)
             {
                 if (velocity.y < 0)
                 {
@@ -153,8 +158,13 @@ public class FPSController : MonoBehaviour
             HeadBob();
 
             // Jump
-            if (Input.GetKeyDown(KeyCode.Space) && controller.isGrounded)
-                velocity.y = Mathf.Sqrt(jumpHeight * -2f * gravity);
+            if (Input.GetKeyDown(KeyCode.Space))
+            {
+                if (reliableIsGrouned)
+                {
+                    velocity.y = Mathf.Sqrt(jumpHeight * -2f * gravity);
+                }
+            }
 
             // Aim Sunray
             if (Input.GetKeyDown(KeyCode.Mouse1))
@@ -212,15 +222,19 @@ public class FPSController : MonoBehaviour
                 }
                 currentShootForce = 0f;
             }
-
-            // Stamina management
-            if (isRunning && move != Vector3.zero)
-                currentStamina -= runStaminaCost * Time.deltaTime;
-            else
-                currentStamina += staminaRecovery * Time.deltaTime;
         }
-
         UpdateGUI();
+
+        // Recover stamina
+        PlantStaminaRecovery();
+    }
+
+    private void PlantStaminaRecovery()
+    {
+        if (nPlantInRange >= 1)
+        {
+            currentStamina += staminaRecovery * Time.deltaTime;
+        }
     }
 
     private void HandleMovement()
@@ -233,7 +247,7 @@ public class FPSController : MonoBehaviour
         {
             isRunning = true;
             currentSpeed = sprintSpeed;
-            frequency = 20f;
+            frequency = 25f;
             amplitude = 2f;
         }
         else
@@ -241,7 +255,7 @@ public class FPSController : MonoBehaviour
             isRunning = false;
             currentSpeed = moveSpeed;
             amplitude = 1f;
-            frequency = 10f;
+            frequency = 15f;
         }
 
         // Directional modifier
@@ -257,7 +271,7 @@ public class FPSController : MonoBehaviour
 
     private void HeadBob()
     {
-        if (finalMove.magnitude < 8f || !controller.isGrounded)
+        if (finalMove.magnitude < 8f || !reliableIsGrouned)
         {
             // Reset position
             if (mainCamera.transform.localPosition == startCameraPos) return;
