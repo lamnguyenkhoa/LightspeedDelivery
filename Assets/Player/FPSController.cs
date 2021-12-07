@@ -281,20 +281,21 @@ public class FPSController : MonoBehaviour
     {
         // Movement
         move = new Vector3(Input.GetAxisRaw("Horizontal"), 0, Input.GetAxisRaw("Vertical"));
+        move = Vector3.ClampMagnitude(move, 1);
         smoothMove = Vector3.Lerp(smoothMove, move, Time.deltaTime * 5f);
 
         if (Input.GetKey(KeyCode.LeftShift))
         {
             isRunning = true;
             currentSpeed = sprintSpeed;
-            frequency = 25f;
-            amplitude = 2f;
+            frequency = 20f;
+            amplitude = 1.8f;
         }
         else
         {
             isRunning = false;
             currentSpeed = moveSpeed;
-            amplitude = 1f;
+            amplitude = 1.2f;
             frequency = 15f;
         }
 
