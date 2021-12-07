@@ -2780,22 +2780,6 @@ PrefabInstance:
       propertyPath: m_Name
       value: Player
       objectReference: {fileID: 0}
-    - target: {fileID: 3221472402477512261, guid: 9270d08c06ddd6a44a6f6f03efdff86d, type: 3}
-      propertyPath: gravity
-      value: -20
-      objectReference: {fileID: 0}
-    - target: {fileID: 3221472402477512261, guid: 9270d08c06ddd6a44a6f6f03efdff86d, type: 3}
-      propertyPath: jumpHeight
-      value: 2.5
-      objectReference: {fileID: 0}
-    - target: {fileID: 3221472402477512261, guid: 9270d08c06ddd6a44a6f6f03efdff86d, type: 3}
-      propertyPath: sprintSpeed
-      value: 14
-      objectReference: {fileID: 0}
-    - target: {fileID: 3221472402477512261, guid: 9270d08c06ddd6a44a6f6f03efdff86d, type: 3}
-      propertyPath: dashStaminaCost
-      value: 25
-      objectReference: {fileID: 0}
     - target: {fileID: 3221472402477512263, guid: 9270d08c06ddd6a44a6f6f03efdff86d, type: 3}
       propertyPath: m_RootOrder
       value: 4

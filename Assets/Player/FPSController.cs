@@ -70,6 +70,10 @@ public class FPSController : MonoBehaviour
     private float frequency;
     private Vector3 startCameraPos;
 
+    private bool isLanding = false;
+    private bool justFall = false;
+    public float maxAchievedFallSpeed = 0f;
+
     [HideInInspector]
     public int nPlantInRange = 0; // Use int instead of bool to prevent edge case bug
 
@@ -117,116 +121,152 @@ public class FPSController : MonoBehaviour
         }
         else
         {
-            mainCamera.fieldOfView = Mathf.Lerp(mainCamera.fieldOfView, startFOV, 0.05f);
-
-            // Camera
-            float mouseX = Input.GetAxis("Mouse X") * mouseSensitivity * Time.deltaTime;
-            float mouseY = Input.GetAxis("Mouse Y") * mouseSensitivity * Time.deltaTime;
-
-            xRotation -= mouseY;
-            xRotation = Mathf.Clamp(xRotation, -90f, 90f);
-            mainCamera.transform.localRotation = Quaternion.Euler(xRotation, 0, 0);
-            transform.Rotate(Vector3.up * mouseX);
+            HandleCamera();
 
             HandleMovement();
-            // Gravity
-            // For some reason, the built-in controller.isGrounded only work if
-            // move the character controller downward first
-            //isGrounded = Physics.CheckSphere(groundCheck.position, 0.4f, groundMask);
-            velocity.y += gravity * Time.deltaTime;
-            velocity.y = Mathf.Clamp(velocity.y, maxGravity, float.MaxValue);
-            controller.Move(velocity * Time.deltaTime);
-            reliableIsGrouned = controller.isGrounded;
-            if (reliableIsGrouned)
+
+            HandleGravity();
+
+            HandleLanding();
+
+            HandleHeadBob();
+
+            HandleSpecialAbilities();
+
+            HandleShootGun();
+
+            UpdateGUI();
+
+            // Recover stamina
+            PlantStaminaRecovery();
+        }
+    }
+
+    private void HandleShootGun()
+    {
+        // Shoot food bag
+        // Hold LMB to charge
+        if (Input.GetKey(KeyCode.Mouse0))
+        {
+            currentShootForce += shootForceIncreaseRate * Time.deltaTime;
+            currentShootForce = Mathf.Clamp(currentShootForce, 0, maxShootForce);
+        }
+
+        if (Input.GetKeyUp(KeyCode.Mouse0))
+        {
+            if (currentShootForce >= minShootForce)
             {
-                if (velocity.y < 0)
-                {
-                    // The velocty.y need to be negative so controller.isGrounded
-                    // work properly
-                    velocity.y = -2f;
-                    // Reset step offset
-                    controller.stepOffset = 0.3f;
-                }
+                FoodBagScript newFoodBag = Instantiate(foodBagPrefab, foodGun.transform.position, Quaternion.identity);
+                newFoodBag.shootDirection = mainCamera.transform.forward;
+                newFoodBag.shootForce = currentShootForce;
+                // not all momentum yet, only player "active" momentum
+                newFoodBag.bonusFromPlayerMomentum = finalMove;
+                Debug.Log("Shoot with " + currentShootForce + " force");
+                currentFoodBag--;
+            }
+            currentShootForce = 0f;
+        }
+    }
+
+    private void HandleSpecialAbilities()
+    {
+        // Aim Sunray
+        if (Input.GetKeyDown(KeyCode.Mouse1))
+            isAiming = true;
+
+        // Cancel aiming
+        if (Input.GetKeyDown(KeyCode.F))
+        {
+            // Cancel aiming
+            isAiming = false;
+            aimRenderer.positionCount = 0;
+        }
+
+        // Render aiming sunray
+        RenderAiming();
+
+        // Use Sunray
+        if (Input.GetKeyUp(KeyCode.Mouse1) && isAiming)
+        {
+            if (currentStamina >= dashStaminaCost)
+            {
+                currentStamina -= dashStaminaCost;
+                SunrayForm();
+                aimRenderer.positionCount = 0;
+                isAiming = false;
+                timer = Time.time;
             }
             else
             {
-                // Prevent character jittering when jump and move forward
-                // near an wall's edge
-                controller.stepOffset = 0f;
-            }
-
-            HeadBob();
-
-            // Jump
-            if (Input.GetKeyDown(KeyCode.Space))
-            {
-                if (reliableIsGrouned)
-                {
-                    velocity.y = Mathf.Sqrt(jumpHeight * -2f * gravity);
-                }
-            }
-
-            // Aim Sunray
-            if (Input.GetKeyDown(KeyCode.Mouse1))
-                isAiming = true;
-
-            // Cancel aiming
-            if (Input.GetKeyDown(KeyCode.F))
-            {
-                // Cancel aiming
                 isAiming = false;
                 aimRenderer.positionCount = 0;
-            }
-
-            // Render aiming sunray
-            RenderAiming();
-
-            // Use Sunray
-            if (Input.GetKeyUp(KeyCode.Mouse1) && isAiming)
-            {
-                if (currentStamina >= dashStaminaCost)
-                {
-                    currentStamina -= dashStaminaCost;
-                    SunrayForm();
-                    aimRenderer.positionCount = 0;
-                    isAiming = false;
-                    timer = Time.time;
-                }
-                else
-                {
-                    isAiming = false;
-                    aimRenderer.positionCount = 0;
-                    Debug.Log("Not enough stamina");
-                }
-            }
-
-            // Shoot food bag
-            // Hold LMB to charge
-            if (Input.GetKey(KeyCode.Mouse0))
-            {
-                currentShootForce += shootForceIncreaseRate * Time.deltaTime;
-                currentShootForce = Mathf.Clamp(currentShootForce, 0, maxShootForce);
-            }
-
-            if (Input.GetKeyUp(KeyCode.Mouse0))
-            {
-                if (currentShootForce >= minShootForce)
-                {
-                    FoodBagScript newFoodBag = Instantiate(foodBagPrefab, foodGun.transform.position, Quaternion.identity);
-                    newFoodBag.shootDirection = mainCamera.transform.forward;
-                    newFoodBag.shootForce = currentShootForce;
-                    // not all momentum yet, only player "active" momentum
-                    newFoodBag.bonusFromPlayerMomentum = finalMove;
-                    Debug.Log("Shoot with " + currentShootForce + " force");
-                    currentFoodBag--;
-                }
-                currentShootForce = 0f;
+                Debug.Log("Not enough stamina");
             }
         }
-        UpdateGUI();
+    }
 
-        // Recover stamina
-        PlantStaminaRecovery();
+    private void HandleLanding()
+    {
+        if (justFall && reliableIsGrouned && maxAchievedFallSpeed > 8f)
+        {
+            justFall = false;
+            StartCoroutine(CameraJumpLanding(maxAchievedFallSpeed));
+            maxAchievedFallSpeed = 0f;
+        }
+    }
+
+    private void HandleCamera()
+    {
+        mainCamera.fieldOfView = Mathf.Lerp(mainCamera.fieldOfView, startFOV, 0.05f);
+
+        // Camera
+        float mouseX = Input.GetAxis("Mouse X") * mouseSensitivity * Time.deltaTime;
+        float mouseY = Input.GetAxis("Mouse Y") * mouseSensitivity * Time.deltaTime;
+
+        xRotation -= mouseY;
+        xRotation = Mathf.Clamp(xRotation, -90f, 90f);
+        mainCamera.transform.localRotation = Quaternion.Euler(xRotation, 0, 0);
+        transform.Rotate(Vector3.up * mouseX);
+    }
+
+    private void HandleGravity()
+    {
+        // Gravity
+        // For some reason, the built-in controller.isGrounded only work if
+        // move the character controller downward first
+        //isGrounded = Physics.CheckSphere(groundCheck.position, 0.4f, groundMask);
+        velocity.y += gravity * Time.deltaTime;
+        velocity.y = Mathf.Clamp(velocity.y, maxGravity, float.MaxValue);
+        controller.Move(velocity * Time.deltaTime);
+        reliableIsGrouned = controller.isGrounded;
+        if (reliableIsGrouned)
+        {
+            if (velocity.y < 0)
+            {
+                // The velocty.y need to be negative so controller.isGrounded
+                // work properly
+                velocity.y = -2f;
+                // Reset step offset
+                controller.stepOffset = 0.3f;
+            }
+        }
+        else
+        {
+            // Prevent character jittering when jump and move forward
+            // near an wall's edge
+            controller.stepOffset = 0f;
+            justFall = true;
+            maxAchievedFallSpeed = Mathf.Max(maxAchievedFallSpeed, -velocity.y);
+        }
+
+        // Jump
+        if (Input.GetKeyDown(KeyCode.Space))
+        {
+            if (reliableIsGrouned)
+            {
+                velocity.y = Mathf.Sqrt(jumpHeight * -2f * gravity);
+            }
+        }
     }
 
     private void PlantStaminaRecovery()
@@ -269,8 +309,10 @@ public class FPSController : MonoBehaviour
         controller.Move(finalMove * Time.deltaTime);
     }
 
-    private void HeadBob()
+    private void HandleHeadBob()
     {
+        if (isLanding) return;
+
         if (finalMove.magnitude < 8f || !reliableIsGrouned)
         {
             // Reset position
@@ -423,6 +465,41 @@ public class FPSController : MonoBehaviour
             xRotation = Mathf.Lerp(xRotation, 0f, 0.08f);
             yield return null;
         }
+        yield return null;
+    }
+
+    private IEnumerator CameraJumpLanding(float fallSpeed)
+    {
+        isLanding = true;
+        float downYPos = 0.2f;
+        if (fallSpeed >= 16f)
+            downYPos = -0.5f;
+
+        float upDuration = 0.3f;
+        float downDuration = 0.15f;
+
+        float delta = (downYPos - startCameraPos.y) / downDuration;
+        float timer = 0f;
+        while (timer < downDuration)
+        {
+            timer += Time.deltaTime;
+            mainCamera.transform.localPosition += new Vector3(0, delta, 0) * Time.deltaTime;
+            yield return null;
+        }
+
+        if (fallSpeed >= 16f)
+            yield return new WaitForSeconds(0.1f);
+
+        delta = (startCameraPos.y - downYPos) / upDuration;
+        timer = 0f;
+        while (timer < upDuration)
+        {
+            timer += Time.deltaTime;
+            mainCamera.transform.localPosition += new Vector3(0, delta, 0) * Time.deltaTime;
+            yield return null;
+        }
+
+        isLanding = false;
         yield return null;
     }
 }
