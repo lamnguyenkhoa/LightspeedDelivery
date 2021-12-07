@@ -305,7 +305,8 @@ public class FPSController : MonoBehaviour
             }
             else if (hit.collider.gameObject.tag == "SolarPanel")
             {
-                Debug.Log("You died!");
+                currentStamina = 0f;
+                Debug.Log("You lost all stamina!");
             }
             else
             {
