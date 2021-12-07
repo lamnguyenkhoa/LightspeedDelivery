@@ -16,6 +16,7 @@ public class FPSController : MonoBehaviour
     public float smoothSpeed;
     public float jumpHeight = 4f;
     public float gravity = -9.8f;
+    private float maxGravity = -100f;
 
     //public LayerMask groundMask;
     public LayerMask glassMask;
@@ -59,7 +60,9 @@ public class FPSController : MonoBehaviour
     public GameObject foodGun;
     public FoodBagScript foodBagPrefab;
     private float currentShootForce = 0f;
-    public float maxShootForce = 30f;
+    public float maxShootForce = 60f;
+    public float shootForceIncreaseRate = 20f;
+    public float minShootForce = 5f;
     public int currentFoodBag = 3;
     public Slider shootForceSlider;
 
@@ -127,6 +130,7 @@ public class FPSController : MonoBehaviour
             // move the character controller downward first
             //isGrounded = Physics.CheckSphere(groundCheck.position, 0.4f, groundMask);
             velocity.y += gravity * Time.deltaTime;
+            velocity.y = Mathf.Clamp(velocity.y, maxGravity, -2f);
             controller.Move(velocity * Time.deltaTime);
             if (controller.isGrounded)
             {
@@ -190,13 +194,13 @@ public class FPSController : MonoBehaviour
             // Hold LMB to charge
             if (Input.GetKey(KeyCode.Mouse0))
             {
-                currentShootForce += 10f * Time.deltaTime;
+                currentShootForce += shootForceIncreaseRate * Time.deltaTime;
                 currentShootForce = Mathf.Clamp(currentShootForce, 0, maxShootForce);
             }
 
             if (Input.GetKeyUp(KeyCode.Mouse0))
             {
-                if (currentShootForce >= 2.5f)
+                if (currentShootForce >= minShootForce)
                 {
                     FoodBagScript newFoodBag = Instantiate(foodBagPrefab, foodGun.transform.position, Quaternion.identity);
                     newFoodBag.shootDirection = mainCamera.transform.forward;
