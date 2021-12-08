@@ -13,6 +13,9 @@ public class FoodBagScript : MonoBehaviour
     [HideInInspector]
     public Vector3 bonusFromPlayerMomentum;
 
+    public float returnTime = 10f;
+    private float timer = 0f;
+
     private Rigidbody rb;
 
     private void Start()
@@ -21,12 +24,14 @@ public class FoodBagScript : MonoBehaviour
         rb.AddForce(shootDirection * shootForce + bonusFromPlayerMomentum, ForceMode.Impulse);
     }
 
-    private void OnCollisionEnter(Collision collision)
+    private void Update()
     {
-        FPSController player = collision.transform.GetComponent<FPSController>();
-        if (player)
+        // Foog bad return to player if not reached the deliverySpot
+        // within time. For lore reason just say it has super GPS tracking stuff.
+        timer += Time.deltaTime;
+        if (timer > returnTime)
         {
-            player.currentFoodBag += 1;
+            LevelManager.instance.player.currentFoodBag += 1;
             Destroy(this.gameObject);
         }
     }
