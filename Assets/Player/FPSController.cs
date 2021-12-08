@@ -87,6 +87,14 @@ public class FPSController : MonoBehaviour
     private float coyoteTime = 0.2f;
     private float airTimer = 0f;
 
+    [Header("Wallrun")]
+    public bool enableWallRun = true;
+    public float wallRunStaminaConsumption = 10f;
+    private bool isWallLeft, isWallRight;
+    public bool isWallRunning;
+    private float wallRunCameraTilt;
+    public float maxWallRunCameraTilt;
+
     private void Start()
     {
         controller = transform.GetComponent<CharacterController>();
@@ -136,6 +144,9 @@ public class FPSController : MonoBehaviour
 
             HandleMovement();
 
+            if (enableWallRun)
+                HandleWallRun();
+
             HandleGravity();
 
             HandleLanding();
@@ -151,6 +162,53 @@ public class FPSController : MonoBehaviour
             // Recover stamina
             PlantStaminaRecovery();
         }
+    }
+
+    private void HandleWallRun()
+    {
+        // Tilt camera back
+        if (wallRunCameraTilt > 0 && !isWallRunning)
+            wallRunCameraTilt -= maxWallRunCameraTilt * 2 * Time.deltaTime;
+        if (wallRunCameraTilt < 0 && !isWallRunning)
+            wallRunCameraTilt += maxWallRunCameraTilt * 2 * Time.deltaTime;
+
+        // No wallrun if you on ground bruh
+        // Also no wallrun if no stamina
+        if (currentStamina <= 0 || reliableIsGrouned)
+        {
+            isWallRunning = false;
+            return;
+        }
+
+        // Check for wall
+        isWallRight = Physics.Raycast(transform.position, transform.right, 1f);
+        isWallLeft = Physics.Raycast(transform.position, -transform.right, 1f);
+        if (!isWallLeft && !isWallRight)
+            isWallRunning = false;
+
+        // Start wallrun
+        if ((Input.GetKey(KeyCode.D) && isWallRight) ||
+            (Input.GetKey(KeyCode.A) && isWallLeft))
+        {
+            isWallRunning = true;
+            // Keep the player from fall down (they still fall down a tiny bit though)
+            if (velocity.y < 0) velocity.y = 0;
+
+            // Stick to wall
+            if (isWallRight)
+                controller.Move(transform.right * Time.deltaTime);
+            else
+                controller.Move(-transform.right * Time.deltaTime);
+
+            // Consume stamina
+            currentStamina -= wallRunStaminaConsumption * Time.deltaTime;
+        }
+
+        // Camera tilt in 0.5s
+        if (Mathf.Abs(wallRunCameraTilt) < maxWallRunCameraTilt && isWallRunning && isWallRight)
+            wallRunCameraTilt += maxWallRunCameraTilt * 2 * Time.deltaTime;
+        if (Mathf.Abs(wallRunCameraTilt) < maxWallRunCameraTilt && isWallRunning && isWallLeft)
+            wallRunCameraTilt -= maxWallRunCameraTilt * 2 * Time.deltaTime;
     }
 
     private void HandleShootGun()
@@ -253,7 +311,7 @@ public class FPSController : MonoBehaviour
 
         xRotation -= mouseY;
         xRotation = Mathf.Clamp(xRotation, -90f, 90f);
-        mainCamera.transform.localRotation = Quaternion.Euler(xRotation, 0, 0);
+        mainCamera.transform.localRotation = Quaternion.Euler(xRotation, 0, wallRunCameraTilt);
         transform.Rotate(Vector3.up * mouseX);
     }
 
@@ -291,7 +349,7 @@ public class FPSController : MonoBehaviour
         // Jump
         if (Input.GetKeyDown(KeyCode.Space))
         {
-            if (reliableIsGrouned || airTimer <= coyoteTime)
+            if (reliableIsGrouned || airTimer <= coyoteTime || isWallRunning)
             {
                 velocity.y = Mathf.Sqrt(jumpHeight * -2f * gravity);
             }
@@ -313,9 +371,17 @@ public class FPSController : MonoBehaviour
         move = Vector3.ClampMagnitude(move, 1);
         smoothMove = Vector3.Lerp(smoothMove, move, Time.deltaTime * 5f);
 
-        if (Input.GetKey(KeyCode.LeftShift))
+        if (Input.GetKey(KeyCode.LeftShift) || isWallRunning)
         {
             isRunning = true;
+        }
+        else
+        {
+            isRunning = false;
+        }
+
+        if (isRunning)
+        {
             currentSpeed = sprintSpeed;
             frequency = 20f;
             amplitude = 1.8f;
@@ -485,6 +551,9 @@ public class FPSController : MonoBehaviour
         //Gizmos.DrawWireSphere(groundCheck.position, 0.4f);
         Gizmos.color = Color.red;
         Gizmos.DrawRay(mainCamera.transform.position, mainCamera.transform.forward);
+
+        Gizmos.color = Color.blue;
+        Gizmos.DrawRay(transform.position, transform.right);
     }
 
     private IEnumerator SmoothResetCameraAfterDash()

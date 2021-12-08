@@ -2994,6 +2994,10 @@ PrefabInstance:
       propertyPath: m_Name
       value: Player
       objectReference: {fileID: 0}
+    - target: {fileID: 3221472402477512261, guid: 9270d08c06ddd6a44a6f6f03efdff86d, type: 3}
+      propertyPath: maxWallRunCameraTilt
+      value: 15
+      objectReference: {fileID: 0}
     - target: {fileID: 3221472402477512263, guid: 9270d08c06ddd6a44a6f6f03efdff86d, type: 3}
       propertyPath: m_RootOrder
       value: 4

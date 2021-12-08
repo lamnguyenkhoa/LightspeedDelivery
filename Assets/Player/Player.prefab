@@ -1591,6 +1591,11 @@ MonoBehaviour:
   requiredDeliveryAmount: 3
   deliveredAmount: 0
   nPlantInRange: 0
+  enableWallRun: 1
+  wallRunStaminaConsumption: 20
+  isWallRunning: 0
+  wallRunCameraTilt: 0
+  maxWallRunCameraTilt: 0
 --- !u!54 &3221472402477512262
 Rigidbody:
   m_ObjectHideFlags: 0
