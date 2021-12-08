@@ -1,6 +1,7 @@
 using System;
 using System.Collections;
 using System.Collections.Generic;
+using TMPro;
 using UnityEditor;
 using UnityEngine;
 using UnityEngine.UI;
@@ -63,8 +64,14 @@ public class FPSController : MonoBehaviour
     public float maxShootForce = 60f;
     public float shootForceIncreaseRate = 20f;
     public float minShootForce = 5f;
-    public int currentFoodBag = 3;
+    public int currentFoodBag; // max number must be equal or higher than requiredDeliveryAmount
     public Slider shootForceSlider;
+    private bool isGunCharging = false;
+
+    public TextMeshProUGUI deliveredText;
+    public TextMeshProUGUI foodBagLeftText;
+    public int requiredDeliveryAmount = 3; // set at start of misison
+    public int deliveredAmount;
 
     private float amplitude;
     private float frequency;
@@ -72,7 +79,7 @@ public class FPSController : MonoBehaviour
 
     private bool isLanding = false;
     private bool justFall = false;
-    public float maxAchievedFallSpeed = 0f;
+    private float maxAchievedFallSpeed = 0f;
 
     [HideInInspector]
     public int nPlantInRange = 0; // Use int instead of bool to prevent edge case bug
@@ -89,6 +96,7 @@ public class FPSController : MonoBehaviour
         currentStamina = 0f;
         startCameraPos = mainCamera.transform.localPosition;
         nPlantInRange = 0;
+        currentFoodBag = requiredDeliveryAmount;
     }
 
     private void Update()
@@ -148,26 +156,39 @@ public class FPSController : MonoBehaviour
     private void HandleShootGun()
     {
         // Shoot food bag
-        // Hold LMB to charge
-        if (Input.GetKey(KeyCode.Mouse0))
+        // "Hold" LMB to charge
+        if (Input.GetKeyDown(KeyCode.Mouse0))
+        {
+            isGunCharging = true;
+        }
+
+        if (isGunCharging)
         {
             currentShootForce += shootForceIncreaseRate * Time.deltaTime;
             currentShootForce = Mathf.Clamp(currentShootForce, 0, maxShootForce);
         }
 
-        if (Input.GetKeyUp(KeyCode.Mouse0))
+        // Cancel aiming
+        if (Input.GetKeyDown(KeyCode.F))
         {
-            if (currentShootForce >= minShootForce)
+            isGunCharging = false;
+            currentShootForce = 0f;
+        }
+
+        // Release charged shoot
+        if (Input.GetKeyUp(KeyCode.Mouse0) && isGunCharging)
+        {
+            if (currentShootForce >= minShootForce && currentFoodBag >= 1)
             {
                 FoodBagScript newFoodBag = Instantiate(foodBagPrefab, foodGun.transform.position, Quaternion.identity);
                 newFoodBag.shootDirection = mainCamera.transform.forward;
                 newFoodBag.shootForce = currentShootForce;
                 // not all momentum yet, only player "active" momentum
                 newFoodBag.bonusFromPlayerMomentum = finalMove;
-                Debug.Log("Shoot with " + currentShootForce + " force");
-                currentFoodBag--;
+                currentFoodBag -= 1;
             }
             currentShootForce = 0f;
+            isGunCharging = false;
         }
     }
 
@@ -344,6 +365,8 @@ public class FPSController : MonoBehaviour
         currentStamina = Mathf.Clamp(currentStamina, 0, maxStamina);
         staminaSlider.value = currentStamina / maxStamina;
         shootForceSlider.value = currentShootForce / maxShootForce;
+        deliveredText.text = "Delivered: " + deliveredAmount + "/" + requiredDeliveryAmount;
+        foodBagLeftText.text = "Food bags left: " + currentFoodBag;
     }
 
     private void SunrayDash()

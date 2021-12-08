@@ -20,4 +20,14 @@ public class FoodBagScript : MonoBehaviour
         rb = GetComponent<Rigidbody>();
         rb.AddForce(shootDirection * shootForce + bonusFromPlayerMomentum, ForceMode.Impulse);
     }
+
+    private void OnCollisionEnter(Collision collision)
+    {
+        FPSController player = collision.transform.GetComponent<FPSController>();
+        if (player)
+        {
+            player.currentFoodBag += 1;
+            Destroy(this.gameObject);
+        }
+    }
 }
