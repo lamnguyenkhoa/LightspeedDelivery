@@ -473,6 +473,7 @@ public class FPSController : MonoBehaviour
 
     private void SunrayForm()
     {
+        wallRunCameraTilt = 0f;
         dashDirection = mainCamera.transform.forward;
         inSunrayForm = true;
         sunrayModel.SetActive(true);

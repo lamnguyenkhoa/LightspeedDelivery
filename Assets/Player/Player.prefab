@@ -1594,8 +1594,7 @@ MonoBehaviour:
   enableWallRun: 1
   wallRunStaminaConsumption: 20
   isWallRunning: 0
-  wallRunCameraTilt: 0
-  maxWallRunCameraTilt: 0
+  maxWallRunCameraTilt: 15
 --- !u!54 &3221472402477512262
 Rigidbody:
   m_ObjectHideFlags: 0
