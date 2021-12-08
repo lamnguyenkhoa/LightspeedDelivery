@@ -77,6 +77,9 @@ public class FPSController : MonoBehaviour
     [HideInInspector]
     public int nPlantInRange = 0; // Use int instead of bool to prevent edge case bug
 
+    private float coyoteTime = 0.2f;
+    private float airTimer = 0f;
+
     private void Start()
     {
         controller = transform.GetComponent<CharacterController>();
@@ -207,10 +210,14 @@ public class FPSController : MonoBehaviour
 
     private void HandleLanding()
     {
-        if (justFall && reliableIsGrouned && maxAchievedFallSpeed > 8f)
+        if (justFall && reliableIsGrouned)
         {
             justFall = false;
-            StartCoroutine(CameraJumpLanding(maxAchievedFallSpeed));
+            airTimer = 0f;
+            if (maxAchievedFallSpeed > 8f)
+            {
+                StartCoroutine(CameraJumpLanding(maxAchievedFallSpeed));
+            }
             maxAchievedFallSpeed = 0f;
         }
     }
@@ -256,13 +263,14 @@ public class FPSController : MonoBehaviour
             // near an wall's edge
             controller.stepOffset = 0f;
             justFall = true;
+            airTimer += Time.deltaTime;
             maxAchievedFallSpeed = Mathf.Max(maxAchievedFallSpeed, -velocity.y);
         }
 
         // Jump
         if (Input.GetKeyDown(KeyCode.Space))
         {
-            if (reliableIsGrouned)
+            if (reliableIsGrouned || airTimer <= coyoteTime)
             {
                 velocity.y = Mathf.Sqrt(jumpHeight * -2f * gravity);
             }
