@@ -180,7 +180,7 @@ public class FPSController : MonoBehaviour
         {
             if (currentShootForce >= minShootForce && currentFoodBag >= 1)
             {
-                FoodBagScript newFoodBag = Instantiate(foodBagPrefab, foodGun.transform.position, Quaternion.identity);
+                FoodBagScript newFoodBag = Instantiate(foodBagPrefab, foodGun.transform.position, Quaternion.Euler(new Vector3(-90, 0, 0)));
                 newFoodBag.shootDirection = mainCamera.transform.forward;
                 newFoodBag.shootForce = currentShootForce;
                 // not all momentum yet, only player "active" momentum
