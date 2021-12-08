@@ -14,6 +14,7 @@ GameObject:
   - component: {fileID: 5123792501055950375}
   - component: {fileID: -777462847737924251}
   - component: {fileID: 196713247}
+  - component: {fileID: 2088581040829967992}
   m_Layer: 0
   m_Name: FoodBag
   m_TagString: Untagged
@@ -129,4 +130,17 @@ BoxCollider:
   m_Enabled: 1
   serializedVersion: 2
   m_Size: {x: 0.7265925, y: 0.62158465, z: 0.7769674}
+  m_Center: {x: 0, y: 0.009022253, z: 0.39185816}
+--- !u!135 &2088581040829967992
+SphereCollider:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 928295526510508277}
+  m_Material: {fileID: 0}
+  m_IsTrigger: 1
+  m_Enabled: 1
+  serializedVersion: 2
+  m_Radius: 0.6
   m_Center: {x: 0, y: 0.009022253, z: 0.39185816}
