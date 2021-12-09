@@ -1152,7 +1152,7 @@ Transform:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 3221472401123122990}
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: -0, y: 0.5, z: 0.08}
+  m_LocalPosition: {x: -0, y: 0.5, z: 0}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_Children:
   - {fileID: 1051699257}
@@ -1592,9 +1592,10 @@ MonoBehaviour:
   deliveredAmount: 0
   nPlantInRange: 0
   enableWallRun: 1
-  wallRunStaminaConsumption: 20
+  wallRunStaminaConsumption: 1
   isWallRunning: 0
   maxWallRunCameraTilt: 15
+  wallJumpLockControlTime: 0.5
 --- !u!54 &3221472402477512262
 Rigidbody:
   m_ObjectHideFlags: 0
