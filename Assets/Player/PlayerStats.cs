@@ -30,4 +30,9 @@ public class PlayerStats : ScriptableObject
     {
         deliveredAmount += 1;
     }
+
+    public void ResetStats()
+    {
+        deliveredAmount = 0;
+    }
 }

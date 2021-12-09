@@ -115,6 +115,11 @@ public class FPSController : MonoBehaviour
 
     #region UnityCallbacks
 
+    private void Awake() 
+    {
+        playerStats.ResetStats();
+    }
+
     private void Start()
 
     {
