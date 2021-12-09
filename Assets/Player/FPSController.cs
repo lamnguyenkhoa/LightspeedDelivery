@@ -94,6 +94,9 @@ public class FPSController : MonoBehaviour
     public bool isWallRunning;
     private float wallRunCameraTilt;
     public float maxWallRunCameraTilt;
+    public float wallJumpLockControlTime = 1f; // disable player control in this amount of time
+    private float wallJumpTimer;
+    private float wallJumpDirection; // which side the player will jump toward, either -1 or 1
 
     private void Start()
     {
@@ -191,6 +194,10 @@ public class FPSController : MonoBehaviour
             (Input.GetKey(KeyCode.A) && isWallLeft))
         {
             isWallRunning = true;
+        }
+
+        if (isWallRunning)
+        {
             // Keep the player from fall down (they still fall down a tiny bit though)
             if (velocity.y < 0) velocity.y = 0;
 
@@ -345,15 +352,6 @@ public class FPSController : MonoBehaviour
             airTimer += Time.deltaTime;
             maxAchievedFallSpeed = Mathf.Max(maxAchievedFallSpeed, -velocity.y);
         }
-
-        // Jump
-        if (Input.GetKeyDown(KeyCode.Space))
-        {
-            if (reliableIsGrouned || airTimer <= coyoteTime || isWallRunning)
-            {
-                velocity.y = Mathf.Sqrt(jumpHeight * -2f * gravity);
-            }
-        }
     }
 
     private void PlantStaminaRecovery()
@@ -368,17 +366,22 @@ public class FPSController : MonoBehaviour
     {
         // Movement
         move = new Vector3(Input.GetAxisRaw("Horizontal"), 0, Input.GetAxisRaw("Vertical"));
-        move = Vector3.ClampMagnitude(move, 1);
+
+        if (wallJumpTimer > 0f)
+        {
+            // Force horizontal move direction
+            move.x = wallJumpDirection;
+            wallJumpTimer -= Time.deltaTime;
+        }
+
+        if (!isWallRunning)
+            move = Vector3.ClampMagnitude(move, 1);
         smoothMove = Vector3.Lerp(smoothMove, move, Time.deltaTime * 5f);
 
         if (Input.GetKey(KeyCode.LeftShift) || isWallRunning)
-        {
             isRunning = true;
-        }
         else
-        {
             isRunning = false;
-        }
 
         if (isRunning)
         {
@@ -388,7 +391,6 @@ public class FPSController : MonoBehaviour
         }
         else
         {
-            isRunning = false;
             currentSpeed = moveSpeed;
             amplitude = 1.2f;
             frequency = 15f;
@@ -403,13 +405,32 @@ public class FPSController : MonoBehaviour
         smoothSpeed = Mathf.Lerp(smoothSpeed, currentSpeed, Time.deltaTime * 5f);
         finalMove = (smoothMove.x * transform.right + smoothMove.z * transform.forward) * smoothSpeed;
         controller.Move(finalMove * Time.deltaTime);
+
+        // Jump
+        if (Input.GetKeyDown(KeyCode.Space))
+        {
+            if (reliableIsGrouned || airTimer <= coyoteTime || isWallRunning)
+            {
+                velocity.y = Mathf.Sqrt(jumpHeight * -2f * gravity);
+
+                // Extra left/right velocity if jump while wall running
+                if (isWallRunning)
+                {
+                    wallJumpTimer = wallJumpLockControlTime;
+                    if (isWallLeft)
+                        wallJumpDirection = 1f; // jump to the right
+                    else
+                        wallJumpDirection = -1f;
+                }
+            }
+        }
     }
 
     private void HandleHeadBob()
     {
         if (isLanding) return;
 
-        if (finalMove.magnitude < 8f || !reliableIsGrouned)
+        if (finalMove.magnitude < 8f || (!reliableIsGrouned && !isWallRunning))
         {
             // Reset position
             if (mainCamera.transform.localPosition == startCameraPos) return;
