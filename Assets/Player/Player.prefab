@@ -2066,15 +2066,15 @@ MonoBehaviour:
   currentSpeed: 0
   smoothSpeed: 0
   jumpHeight: 2.5
-  gravity: -20
+  gravity: -30
   glassMask:
     serializedVersion: 2
     m_Bits: 512
-  sunraySpeed: 50
+  sunraySpeed: 40
   maxPower: 100
   powerSlider: {fileID: 576655567}
   dashCost: 25
-  timeInSunrayForm: 0.5
+  timeInSunrayForm: 0.4
   resetCameraAfterDash: 0
   maxFOV: 90
   characterModel: {fileID: 3221472400908256429}
@@ -2096,9 +2096,9 @@ MonoBehaviour:
   enableWallRun: 1
   maxStamina: 100
   staminaSlider: {fileID: 1124928550}
-  staminaRecovery: 10
+  staminaRecovery: 50
   staminaRecoveryDelay: 1.5
-  wallRunCost: 10
+  wallRunCost: 100
   isWallRunning: 0
   maxWallRunCameraTilt: 15
   wallJumpLockControlTime: 0.5

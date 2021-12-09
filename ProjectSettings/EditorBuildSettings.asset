@@ -5,7 +5,13 @@ EditorBuildSettings:
   m_ObjectHideFlags: 0
   serializedVersion: 2
   m_Scenes:
-  - enabled: 1
+  - enabled: 0
     path: Assets/Levels/TestFPSMovement.unity
     guid: fcbde5f8cb091394ea578a1a4a596d6b
+  - enabled: 0
+    path: Assets/Levels/Playgrounds/ProbuilderTest.unity
+    guid: 6d38a50b0c9fc49499b6706a123e9d9a
+  - enabled: 1
+    path: Assets/Levels/Playgrounds/CityTest.unity
+    guid: ee15978583b302248ba9d38f2c47a3f1
   m_configObjects: {}
