@@ -8,9 +8,19 @@ using UnityEngine.UI;
 
 public class FPSController : MonoBehaviour
 {
+    [Space, Header("Camera")]
     public float mouseSensitivity = 100f;
     public Camera mainCamera;
 
+    // Headbob
+    private float amplitude;
+    private float frequency;
+    private Vector3 startCameraPos;
+    private bool isLanding = false;
+    private bool justFall = false;
+    private float maxAchievedFallSpeed = 0f;
+
+    [Space, Header("Movement")]
     public float moveSpeed = 7f;
     public float sprintSpeed = 12f;
     public float currentSpeed;
@@ -18,46 +28,42 @@ public class FPSController : MonoBehaviour
     public float jumpHeight = 4f;
     public float gravity = -9.8f;
     private float maxGravity = -100f;
-
-    //public LayerMask groundMask;
+    private Vector3 move; // player controlled movement
+    private Vector3 smoothMove;
+    private Vector3 finalMove;
     public LayerMask glassMask;
     private float xRotation;
-    public Vector3 move; // player controlled movement
-    public Vector3 smoothMove;
-    public Vector3 finalMove;
-
-    public Vector3 velocity; // environmental stuff affect player movement
+    private bool isRunning;
+    private Vector3 velocity; // environmental stuff affect player movement
     private Vector3 dashDirection;
     private CharacterController controller;
-
-    //public bool isGrounded = false;
-    //public Transform groundCheck;
     private bool reliableIsGrouned; // because controller.isGrounded is damn unreliable
-    private bool inSunrayForm = false;
+    private float coyoteTime = 0.2f;
+    private float airTimer = 0f;
+
+    [Space, Header("Sunray dash")]
     public float sunraySpeed = 20f;
+    private bool inSunrayForm = false;
+    public float maxPower = 100f;
+    private float currentPower;
+    public Slider powerSlider;
+    public float dashCost = 25f;
+    private float powerRecovery = 50f;
+    public float timeInSunrayForm = 0.5f;
+    private float timer;
+    private bool isAiming = false;
+    public bool resetCameraAfterDash = false;
+    public float maxFOV = 90f;
+    private float startFOV;
     public GameObject characterModel;
     public GameObject sunrayModel;
     public GameObject sunTrailPrefab;
-
     public LineRenderer aimRenderer;
 
-    public bool resetCameraAfterDash = false;
+    // Use int instead of bool to prevent edge case bug
+    [HideInInspector] public int nPlantInRange = 0;
 
-    public float timeInSunrayForm = 0.5f;
-    private float timer;
-
-    public float maxStamina = 100f;
-    private float currentStamina;
-    public Slider staminaSlider;
-    private bool isRunning;
-    public float dashStaminaCost = 25f;
-    private float staminaRecovery = 50f;
-
-    private bool isAiming = false;
-
-    public float maxFOV = 90f;
-    private float startFOV;
-
+    [Space, Header("Food gun")]
     public GameObject foodGun;
     public FoodBagScript foodBagPrefab;
     private float currentShootForce = 0f;
@@ -68,28 +74,21 @@ public class FPSController : MonoBehaviour
     public Slider shootForceSlider;
     private bool isGunCharging = false;
 
+    [Space, Header("GUI")]
     public TextMeshProUGUI deliveredText;
     public TextMeshProUGUI foodBagLeftText;
     public int requiredDeliveryAmount = 3; // set at start of misison
     public int deliveredAmount;
 
-    private float amplitude;
-    private float frequency;
-    private Vector3 startCameraPos;
-
-    private bool isLanding = false;
-    private bool justFall = false;
-    private float maxAchievedFallSpeed = 0f;
-
-    [HideInInspector]
-    public int nPlantInRange = 0; // Use int instead of bool to prevent edge case bug
-
-    private float coyoteTime = 0.2f;
-    private float airTimer = 0f;
-
-    [Header("Wallrun")]
+    [Space, Header("Wallrun")]
     public bool enableWallRun = true;
-    public float wallRunStaminaConsumption = 10f;
+    public float maxStamina = 100f;
+    private float currentStamina;
+    public Slider staminaSlider;
+    public float staminaRecovery = 10f;
+    public float staminaRecoveryDelay = 1.5f;
+    private float timeSinceLastUseStamina;
+    public float wallRunCost = 10f;
     private bool isWallLeft, isWallRight;
     public bool isWallRunning;
     private float wallRunCameraTilt;
@@ -104,7 +103,7 @@ public class FPSController : MonoBehaviour
         Cursor.lockState = CursorLockMode.Locked;
         velocity = Vector3.zero;
         startFOV = mainCamera.fieldOfView;
-        currentStamina = 0f;
+        currentPower = 0f;
         startCameraPos = mainCamera.transform.localPosition;
         nPlantInRange = 0;
         currentFoodBag = requiredDeliveryAmount;
@@ -162,8 +161,7 @@ public class FPSController : MonoBehaviour
 
             UpdateGUI();
 
-            // Recover stamina
-            PlantStaminaRecovery();
+            HandleRecovery();
         }
     }
 
@@ -176,7 +174,7 @@ public class FPSController : MonoBehaviour
             wallRunCameraTilt += maxWallRunCameraTilt * 2 * Time.deltaTime;
 
         // No wallrun if you on ground bruh
-        // Also no wallrun if no stamina
+        // Also no wallrun if no power
         if (currentStamina <= 0 || reliableIsGrouned)
         {
             isWallRunning = false;
@@ -207,8 +205,9 @@ public class FPSController : MonoBehaviour
             else
                 controller.Move(-transform.right * Time.deltaTime);
 
-            // Consume stamina
-            currentStamina -= wallRunStaminaConsumption * Time.deltaTime;
+            // Consume power
+            currentStamina -= wallRunCost * Time.deltaTime;
+            timeSinceLastUseStamina = 0f;
         }
 
         // Camera tilt in 0.5s
@@ -277,9 +276,9 @@ public class FPSController : MonoBehaviour
         // Use Sunray
         if (Input.GetKeyUp(KeyCode.Mouse1) && isAiming)
         {
-            if (currentStamina >= dashStaminaCost)
+            if (currentPower >= dashCost)
             {
-                currentStamina -= dashStaminaCost;
+                currentPower -= dashCost;
                 SunrayForm();
                 aimRenderer.positionCount = 0;
                 isAiming = false;
@@ -289,7 +288,7 @@ public class FPSController : MonoBehaviour
             {
                 isAiming = false;
                 aimRenderer.positionCount = 0;
-                Debug.Log("Not enough stamina");
+                Debug.Log("Not enough power");
             }
         }
     }
@@ -354,12 +353,14 @@ public class FPSController : MonoBehaviour
         }
     }
 
-    private void PlantStaminaRecovery()
+    private void HandleRecovery()
     {
         if (nPlantInRange >= 1)
-        {
+            currentPower += powerRecovery * Time.deltaTime;
+
+        timeSinceLastUseStamina += Time.deltaTime;
+        if (timeSinceLastUseStamina >= staminaRecoveryDelay)
             currentStamina += staminaRecovery * Time.deltaTime;
-        }
     }
 
     private void HandleMovement()
@@ -448,10 +449,14 @@ public class FPSController : MonoBehaviour
 
     private void UpdateGUI()
     {
-        // Also prevent currentStamina from going beyond maxStamina
+        // Also prevent currentPower from going beyond maxPower
+        currentPower = Mathf.Clamp(currentPower, 0, maxPower);
+        powerSlider.value = currentPower / maxPower;
         currentStamina = Mathf.Clamp(currentStamina, 0, maxStamina);
         staminaSlider.value = currentStamina / maxStamina;
+
         shootForceSlider.value = currentShootForce / maxShootForce;
+
         deliveredText.text = "Delivered: " + deliveredAmount + "/" + requiredDeliveryAmount;
         foodBagLeftText.text = "Food bags left: " + currentFoodBag;
     }
@@ -480,8 +485,8 @@ public class FPSController : MonoBehaviour
             }
             else if (hit.collider.gameObject.tag == "SolarPanel")
             {
-                currentStamina = 0f;
-                Debug.Log("You lost all stamina!");
+                currentPower = 0f;
+                Debug.Log("You lost all power!");
             }
             else
             {
