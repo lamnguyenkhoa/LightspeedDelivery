@@ -2062,6 +2062,7 @@ MonoBehaviour:
   mainCamera: {fileID: 3221472401123122976}
   moveSpeed: 9
   sprintSpeed: 14
+  crouchSpeed: 4
   currentSpeed: 0
   smoothSpeed: 0
   jumpHeight: 2.5
