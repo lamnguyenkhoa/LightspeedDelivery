@@ -25,6 +25,7 @@ public class FPSController : MonoBehaviour
     [Space, Header("Movement")]
     public float moveSpeed = 7f;
     public float sprintSpeed = 12f;
+    public float crouchSpeed = 4;
     public float currentSpeed;
     public float smoothSpeed;
     public float jumpHeight = 4f;
@@ -42,6 +43,9 @@ public class FPSController : MonoBehaviour
     private bool reliableIsGrouned; // because controller.isGrounded is damn unreliable
     private float coyoteTime = 0.2f;
     private float airTimer = 0f;
+    private bool isCrouching;
+    private float slideMaxTime = 1f;
+    private float slideTimer = 0f;
 
     [Space, Header("Sunray dash")]
     public float sunraySpeed = 20f;
@@ -103,7 +107,7 @@ public class FPSController : MonoBehaviour
     private Animator anim;
 
     private enum State
-    { idle, walking, running, jumping, land }
+    { idle, walking, running, jumping, slide, crouching, land }
     private State state;
 
     #endregion Variables
@@ -122,7 +126,9 @@ public class FPSController : MonoBehaviour
         startCameraPos = mainCamera.transform.localPosition;
         nPlantInRange = 0;
         currentFoodBag = requiredDeliveryAmount;
+        currentStamina = maxStamina;
         state = State.idle;
+        isCrouching = false;
     }
 
     private void Update()
@@ -164,7 +170,7 @@ public class FPSController : MonoBehaviour
 
             HandleAnimation();
 
-            //HandleCrouch();
+            HandleCrouch();
 
             if (enableWallRun)
                 HandleWallRun();
@@ -200,6 +206,10 @@ public class FPSController : MonoBehaviour
         {
             state = State.idle;
         }
+        else if (slideTimer > 0f)
+        {
+            state = State.slide;
+        }
         else if (isRunning)
         {
             state = State.running;
@@ -214,14 +224,27 @@ public class FPSController : MonoBehaviour
 
     private void HandleCrouch()
     {
-        if (Input.GetKey(KeyCode.LeftControl))
+        if (Input.GetKeyDown(KeyCode.C))
         {
-            controller.height = 1;
+            if (isCrouching)
+            {
+                isCrouching = false;
+                slideTimer = 0f;
+            }
+            else
+            {
+                isCrouching = true;
+                if (isRunning)
+                {
+                    slideTimer = slideMaxTime;
+                }
+            }
         }
+
+        if (isCrouching)
+            controller.height = Mathf.Lerp(controller.height, 1f, 0.2f);
         else
-        {
-            controller.height = 2;
-        }
+            controller.height = Mathf.Lerp(controller.height, 2f, 0.2f);
     }
 
     private void HandleWallRun()
@@ -232,9 +255,7 @@ public class FPSController : MonoBehaviour
         if (wallRunCameraTilt < 0 && !isWallRunning)
             wallRunCameraTilt += maxWallRunCameraTilt * 2 * Time.deltaTime;
 
-        // No wallrun if you on ground bruh
-        // Also no wallrun if no power
-        if (currentStamina <= 0 || reliableIsGrouned)
+        if (currentStamina <= 0 || reliableIsGrouned || isCrouching)
         {
             isWallRunning = false;
             return;
@@ -427,6 +448,12 @@ public class FPSController : MonoBehaviour
         // Movement
         move = new Vector3(Input.GetAxisRaw("Horizontal"), 0, Input.GetAxisRaw("Vertical"));
 
+        if (slideTimer > 0f)
+        {
+            move.z = 1f;
+            slideTimer -= Time.deltaTime;
+        }
+
         if (wallJumpTimer > 0f)
         {
             // Force horizontal move direction
@@ -438,7 +465,7 @@ public class FPSController : MonoBehaviour
             move = Vector3.ClampMagnitude(move, 1);
         smoothMove = Vector3.Lerp(smoothMove, move, Time.deltaTime * 5f);
 
-        if (Input.GetKey(KeyCode.LeftShift) || isWallRunning)
+        if ((Input.GetKey(KeyCode.LeftShift) || isWallRunning) && !isCrouching)
             isRunning = true;
         else
             isRunning = false;
@@ -448,6 +475,10 @@ public class FPSController : MonoBehaviour
             currentSpeed = sprintSpeed;
             frequency = 20f;
             amplitude = 1.8f;
+        }
+        else if (isCrouching)
+        {
+            currentSpeed = crouchSpeed;
         }
         else
         {
@@ -462,7 +493,11 @@ public class FPSController : MonoBehaviour
         if (move.z == -1)
             currentSpeed *= 0.5f;
 
-        smoothSpeed = Mathf.Lerp(smoothSpeed, currentSpeed, Time.deltaTime * 5f);
+        if (slideTimer > 0f)
+            smoothSpeed = Mathf.Lerp(smoothSpeed, currentSpeed, 0.005f);
+        else
+            smoothSpeed = Mathf.Lerp(smoothSpeed, currentSpeed, 0.05f);
+
         finalMove = (smoothMove.x * transform.right + smoothMove.z * transform.forward) * smoothSpeed;
         controller.Move(finalMove * Time.deltaTime);
 
@@ -472,6 +507,7 @@ public class FPSController : MonoBehaviour
             if (reliableIsGrouned || airTimer <= coyoteTime || isWallRunning)
             {
                 velocity.y = Mathf.Sqrt(jumpHeight * -2f * gravity);
+                isCrouching = false;
 
                 // Extra left/right velocity if jump while wall running
                 if (isWallRunning)
@@ -490,7 +526,7 @@ public class FPSController : MonoBehaviour
     {
         if (isLanding) return;
 
-        if (finalMove.magnitude < 8f || (!reliableIsGrouned && !isWallRunning))
+        if (finalMove.magnitude < 8f || (!reliableIsGrouned && !isWallRunning) || isCrouching)
         {
             // Reset position
             if (mainCamera.transform.localPosition == startCameraPos) return;
