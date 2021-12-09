@@ -544,7 +544,7 @@ public class FPSController : MonoBehaviour
         RaycastHit hit;
         bool continueBounce = false;
 
-        if (Physics.Raycast(ray, out hit, sunraySpeed * timeInSunrayForm))
+        if (Physics.Raycast(ray, out hit, sunraySpeed * timeInSunrayForm, ~glassMask))
         {
             if (hit.collider.gameObject.tag == "Mirror")
             {
