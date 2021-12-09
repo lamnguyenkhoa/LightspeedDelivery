@@ -81,10 +81,11 @@ public class FPSController : MonoBehaviour
     private bool isGunCharging = false;
 
     [Space, Header("GUI")]
+    public PlayerStats playerStats;
     public TextMeshProUGUI deliveredText;
     public TextMeshProUGUI foodBagLeftText;
     public int requiredDeliveryAmount = 3; // set at start of misison
-    public int deliveredAmount;
+    // public int deliveredAmount;
 
     [Space, Header("Wallrun")]
     public bool enableWallRun = true;
@@ -552,7 +553,7 @@ public class FPSController : MonoBehaviour
 
         shootForceSlider.value = currentShootForce / maxShootForce;
 
-        deliveredText.text = "Delivered: " + deliveredAmount + "/" + requiredDeliveryAmount;
+        deliveredText.text = "Delivered: " + playerStats.deliveredAmount + "/" + requiredDeliveryAmount;
         foodBagLeftText.text = "Food bags left: " + currentFoodBag;
     }
 

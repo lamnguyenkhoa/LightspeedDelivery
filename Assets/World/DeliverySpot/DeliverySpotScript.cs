@@ -1,9 +1,11 @@
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using UnityEngine.Events;
 
 public class DeliverySpotScript : MonoBehaviour
 {
+    public UnityEvent OnFoodDelivered;
     private bool delivered = false;
 
     private void OnTriggerEnter(Collider other)
@@ -13,10 +15,16 @@ public class DeliverySpotScript : MonoBehaviour
         if (other.GetComponent<FoodBagScript>())
         {
             delivered = true;
-            LevelManager.instance.player.deliveredAmount += 1;
+            FoodDelivered();
+            // LevelManager.instance.player.deliveredAmount += 1;
             Destroy(other.gameObject);
             Debug.Log("Delivered 1 foodbag");
-            Destroy(this.gameObject);
+            // Destroy(this.gameObject);
         }
+    }
+
+    public void FoodDelivered()
+    {
+        OnFoodDelivered?.Invoke();
     }
 }

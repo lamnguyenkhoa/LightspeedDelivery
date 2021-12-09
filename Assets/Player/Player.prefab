@@ -2089,10 +2089,10 @@ MonoBehaviour:
   minShootForce: 5
   currentFoodBag: 3
   shootForceSlider: {fileID: 1676966763}
+  playerStats: {fileID: 11400000, guid: ce6d4b0911f31014c88320bde46abec1, type: 2}
   deliveredText: {fileID: 516682183}
   foodBagLeftText: {fileID: 1288257839}
   requiredDeliveryAmount: 3
-  deliveredAmount: 0
   enableWallRun: 1
   maxStamina: 100
   staminaSlider: {fileID: 1124928550}
