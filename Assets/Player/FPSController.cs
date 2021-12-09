@@ -8,6 +8,8 @@ using UnityEngine.UI;
 
 public class FPSController : MonoBehaviour
 {
+    #region Variables
+
     [Space, Header("Camera")]
     public float mouseSensitivity = 100f;
     public Camera mainCamera;
@@ -97,9 +99,22 @@ public class FPSController : MonoBehaviour
     private float wallJumpTimer;
     private float wallJumpDirection; // which side the player will jump toward, either -1 or 1
 
+    [Space, Header("Animation")]
+    private Animator anim;
+
+    private enum State
+    { idle, walking, running, jumping, land }
+    private State state;
+
+    #endregion Variables
+
+    #region UnityCallbacks
+
     private void Start()
+
     {
-        controller = transform.GetComponent<CharacterController>();
+        controller = GetComponent<CharacterController>();
+        anim = GetComponent<Animator>();
         Cursor.lockState = CursorLockMode.Locked;
         velocity = Vector3.zero;
         startFOV = mainCamera.fieldOfView;
@@ -107,6 +122,7 @@ public class FPSController : MonoBehaviour
         startCameraPos = mainCamera.transform.localPosition;
         nPlantInRange = 0;
         currentFoodBag = requiredDeliveryAmount;
+        state = State.idle;
     }
 
     private void Update()
@@ -146,6 +162,10 @@ public class FPSController : MonoBehaviour
 
             HandleMovement();
 
+            HandleAnimation();
+
+            //HandleCrouch();
+
             if (enableWallRun)
                 HandleWallRun();
 
@@ -162,6 +182,45 @@ public class FPSController : MonoBehaviour
             UpdateGUI();
 
             HandleRecovery();
+        }
+    }
+
+    #endregion UnityCallbacks
+
+    #region MainFunctions
+
+    private void HandleAnimation()
+    {
+        float finalMoveMagnitude = finalMove.magnitude;
+        if (!reliableIsGrouned && !isWallRunning)
+        {
+            state = State.jumping;
+        }
+        else if (finalMoveMagnitude <= 0.5f)
+        {
+            state = State.idle;
+        }
+        else if (isRunning)
+        {
+            state = State.running;
+        }
+        else
+        {
+            state = State.walking;
+        }
+
+        anim.SetInteger("state", (int)state);
+    }
+
+    private void HandleCrouch()
+    {
+        if (Input.GetKey(KeyCode.LeftControl))
+        {
+            controller.height = 1;
+        }
+        else
+        {
+            controller.height = 2;
         }
     }
 
@@ -461,6 +520,18 @@ public class FPSController : MonoBehaviour
         foodBagLeftText.text = "Food bags left: " + currentFoodBag;
     }
 
+    /// <summary>
+    /// This function will be deprecated when we has player model
+    /// and player walk/run animation
+    /// </summary>
+    private void HandleFootstepSound()
+    {
+    }
+
+    #endregion MainFunctions
+
+    #region SubFuctions
+
     private void SunrayDash()
     {
         //GameObject sunTrail = Instantiate(sunTrailPrefab, this.transform, true);
@@ -583,6 +654,10 @@ public class FPSController : MonoBehaviour
         Gizmos.DrawRay(transform.position, transform.right);
     }
 
+    #endregion SubFuctions
+
+    #region Coroutine
+
     private IEnumerator SmoothResetCameraAfterDash()
     {
         float resetDuration = 0.2f;
@@ -630,4 +705,15 @@ public class FPSController : MonoBehaviour
         isLanding = false;
         yield return null;
     }
+
+    #endregion Coroutine
+
+    #region AnimationEvents
+
+    public void PlayFootstep()
+    {
+        AudioManager.instance.PlayFootstep();
+    }
+
+    #endregion AnimationEvents
 }

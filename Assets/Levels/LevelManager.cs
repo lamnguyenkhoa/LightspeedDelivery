@@ -5,6 +5,8 @@ using UnityEngine;
 public class LevelManager : MonoBehaviour
 {
     public static LevelManager instance;
+
+    [HideInInspector]
     public FPSController player;
 
     private void Awake()
