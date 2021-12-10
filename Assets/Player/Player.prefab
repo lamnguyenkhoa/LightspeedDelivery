@@ -2098,7 +2098,7 @@ MonoBehaviour:
   staminaSlider: {fileID: 1124928550}
   staminaRecovery: 50
   staminaRecoveryDelay: 1.5
-  wallRunCost: 100
+  wallRunCost: 75
   isWallRunning: 0
   maxWallRunCameraTilt: 15
   wallJumpLockControlTime: 0.5
