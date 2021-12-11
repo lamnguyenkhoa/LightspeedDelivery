@@ -58,6 +58,7 @@ public class FPSController : MonoBehaviour
     private Vector3 slopeNormal;
 
     [Space, Header("Sunray dash")]
+    public float rayDetectionDistance = 1.5f;
     public float sunraySpeed = 20f;
     private bool inSunrayForm = false;
     public float maxPower = 100f;
@@ -495,13 +496,13 @@ public class FPSController : MonoBehaviour
         mainCamera.fieldOfView = Mathf.Lerp(mainCamera.fieldOfView, startFOV, 0.05f);
 
         // Camera
-        float mouseX = Input.GetAxis("Mouse X") * mouseSensitivity * Time.deltaTime;
-        float mouseY = Input.GetAxis("Mouse Y") * mouseSensitivity * Time.deltaTime;
+        float mouseX = Input.GetAxis("Mouse X") * mouseSensitivity;
+        float mouseY = Input.GetAxis("Mouse Y") * mouseSensitivity;
 
-        xRotation -= mouseY;
+        xRotation -= mouseY * Time.deltaTime;
         xRotation = Mathf.Clamp(xRotation, -90f, 90f);
         mainCamera.transform.localRotation = Quaternion.Euler(xRotation, 0, wallRunCameraTilt);
-        transform.Rotate(Vector3.up * mouseX);
+        transform.Rotate(Vector3.up * mouseX * Time.deltaTime);
     }
 
     private void HandleGravity()
@@ -702,7 +703,7 @@ public class FPSController : MonoBehaviour
         // Check to see if in front of player is mirror
         RaycastHit hit;
         if (Physics.Raycast(transform.position, dashDirection,
-                out hit, 0.5f, Physics.DefaultRaycastLayers, QueryTriggerInteraction.Ignore))
+                out hit, rayDetectionDistance, Physics.DefaultRaycastLayers, QueryTriggerInteraction.Ignore))
         {
             if (hit.collider.gameObject.tag == "Mirror")
             {
