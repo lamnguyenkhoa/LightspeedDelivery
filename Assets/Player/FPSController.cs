@@ -44,7 +44,7 @@ public class FPSController : MonoBehaviour
     private float coyoteTime = 0.2f;
     private float airTimer = 0f;
     private bool isCrouching;
-    private float slideMaxTime = 1f;
+    private float slideMaxTime = 2f;
     private float slideTimer = 0f;
 
     [Space, Header("Slope")]
@@ -290,7 +290,7 @@ public class FPSController : MonoBehaviour
             airTimer = coyoteTime + 1f; // prevent coyote jump
         }
 
-        if (slopeCanLongSlide && (slopeAngle > forceSlideLimit || isCrouching))
+        if (slopeCanLongSlide && slideTimer <= 0 && (slopeAngle > forceSlideLimit || isCrouching))
         {
             // Use slide animation
             isCrouching = true;
