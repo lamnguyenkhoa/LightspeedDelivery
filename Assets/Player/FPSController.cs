@@ -47,6 +47,12 @@ public class FPSController : MonoBehaviour
     private float slideMaxTime = 1f;
     private float slideTimer = 0f;
 
+    [Space, Header("Slope")]
+    public float slopeAngle;
+    public bool slopeCanWalk;
+    public bool slopeCanLongSlide;
+    public bool slopeVerySteep;
+
     [Space, Header("Sunray dash")]
     public float sunraySpeed = 20f;
     private bool inSunrayForm = false;
@@ -115,7 +121,7 @@ public class FPSController : MonoBehaviour
 
     #region UnityCallbacks
 
-    private void Awake() 
+    private void Awake()
     {
         playerStats.ResetStats();
     }
@@ -172,6 +178,8 @@ public class FPSController : MonoBehaviour
         {
             HandleCamera();
 
+            HandleSlope();
+
             HandleMovement();
 
             HandleAnimation();
@@ -200,6 +208,84 @@ public class FPSController : MonoBehaviour
     #endregion UnityCallbacks
 
     #region MainFunctions
+
+    private void HandleSlope()
+    {
+        Vector3 slopeNormal = Vector3.zero;
+        if (reliableIsGrouned)
+        {
+            // Check raycast downward
+            if (Physics.Raycast(transform.position - new Vector3(0, controller.height / 2, 0), Vector3.down, out RaycastHit hitDown, 1f))
+            {
+                //Debug.Log(hitDown.transform.name);
+                slopeNormal = hitDown.normal;
+                slopeAngle = Vector3.Angle(Vector3.up, hitDown.normal);
+            }
+            // Check raycast forward
+            else if (Physics.Raycast(transform.position + transform.forward * controller.radius, transform.forward, out RaycastHit hitForward, 1f))
+            {
+                //Debug.Log(hitForward.transform.name);
+                slopeNormal = hitForward.normal;
+                slopeAngle = Vector3.Angle(Vector3.up, hitForward.normal);
+            }
+            // Check raycast backward
+            else if (Physics.Raycast(transform.position - transform.forward * controller.radius, -transform.forward, out RaycastHit hitBackward, 1f))
+            {
+                //Debug.Log(hitBackward.transform.name);
+                slopeNormal = hitBackward.normal;
+                slopeAngle = Vector3.Angle(Vector3.up, hitBackward.normal);
+            }
+            // Check raycast rightward
+            else if (Physics.Raycast(transform.position + transform.right * controller.radius, transform.right, out RaycastHit hitRightward, 1f))
+            {
+                //Debug.Log(hitRightward.transform.name);
+                slopeNormal = hitRightward.normal;
+                slopeAngle = Vector3.Angle(Vector3.up, hitRightward.normal);
+            }
+            // Check raycast leftward
+            else if (Physics.Raycast(transform.position - transform.right * controller.radius, -transform.right, out RaycastHit hitLeftward, 1f))
+            {
+                //Debug.Log(hitLeftward.transform.name);
+                slopeNormal = hitLeftward.normal;
+                slopeAngle = Vector3.Angle(Vector3.up, hitLeftward.normal);
+            }
+            else
+            {
+                // It should never reach here
+                slopeAngle = -2f;
+                slopeCanWalk = false;
+                slopeCanLongSlide = false;
+                slopeVerySteep = true;
+            }
+
+            if (0 <= slopeAngle && slopeAngle <= 45)
+                slopeCanWalk = true;
+            else
+                slopeCanWalk = false;
+            if (15 <= slopeAngle && slopeAngle <= 60)
+                slopeCanLongSlide = true;
+            else
+                slopeCanLongSlide = false;
+
+            if (slopeAngle > 60)
+                slopeVerySteep = true;
+            else
+                slopeVerySteep = false;
+        }
+        else
+        {
+            slopeAngle = -1f;
+            slopeCanLongSlide = false;
+            slopeVerySteep = false;
+            slopeCanWalk = false;
+        }
+
+        if (slopeVerySteep)
+        {
+            controller.Move(slopeNormal * 1f * Time.deltaTime);
+            airTimer = coyoteTime + 1f; // prevent coyote jump
+        }
+    }
 
     private void HandleAnimation()
     {
@@ -451,6 +537,8 @@ public class FPSController : MonoBehaviour
 
     private void HandleMovement()
     {
+        float bonusJumpForce;
+
         // Movement
         move = new Vector3(Input.GetAxisRaw("Horizontal"), 0, Input.GetAxisRaw("Vertical"));
 
@@ -508,11 +596,16 @@ public class FPSController : MonoBehaviour
         controller.Move(finalMove * Time.deltaTime);
 
         // Jump
-        if (Input.GetKeyDown(KeyCode.Space))
+        if (Input.GetKeyDown(KeyCode.Space) && !slopeVerySteep)
         {
+            Debug.Log(airTimer);
             if (reliableIsGrouned || airTimer <= coyoteTime || isWallRunning)
             {
-                velocity.y = Mathf.Sqrt(jumpHeight * -2f * gravity);
+                if (isWallRunning)
+                    bonusJumpForce = jumpHeight / 5;
+                else
+                    bonusJumpForce = 0f;
+                velocity.y = Mathf.Sqrt((jumpHeight + bonusJumpForce) * -2f * gravity);
                 isCrouching = false;
 
                 // Extra left/right velocity if jump while wall running
