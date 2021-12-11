@@ -37,7 +37,7 @@ public class FPSController : MonoBehaviour
     public LayerMask glassMask;
     private float xRotation;
     private bool isRunning;
-    private Vector3 velocity; // environmental stuff affect player movement
+    public Vector3 velocity; // environmental stuff affect player movement
     private Vector3 dashDirection;
     private CharacterController controller;
     private bool reliableIsGrouned; // because controller.isGrounded is damn unreliable
@@ -48,10 +48,14 @@ public class FPSController : MonoBehaviour
     private float slideTimer = 0f;
 
     [Space, Header("Slope")]
-    public float slopeAngle;
-    public bool slopeCanWalk;
-    public bool slopeCanLongSlide;
-    public bool slopeVerySteep;
+    [SerializeField] private float slopeAngle;
+    [SerializeField] private bool slopeCanLongSlide;
+    [SerializeField] private bool slopeVerySteep;
+    public float minAngleToLongSlide = 15f;
+    public float forceSlideLimit = 45f; // must larger than walk slope limit
+    public float steepLimit = 60f; // must larger than forceSlideLimit
+
+    private Vector3 slopeNormal;
 
     [Space, Header("Sunray dash")]
     public float sunraySpeed = 20f;
@@ -211,7 +215,7 @@ public class FPSController : MonoBehaviour
 
     private void HandleSlope()
     {
-        Vector3 slopeNormal = Vector3.zero;
+        slopeNormal = Vector3.zero;
         if (reliableIsGrouned)
         {
             // Check raycast downward
@@ -253,21 +257,18 @@ public class FPSController : MonoBehaviour
             {
                 // It should never reach here
                 slopeAngle = -2f;
-                slopeCanWalk = false;
                 slopeCanLongSlide = false;
                 slopeVerySteep = true;
             }
 
-            if (0 <= slopeAngle && slopeAngle <= 45)
-                slopeCanWalk = true;
-            else
-                slopeCanWalk = false;
-            if (15 <= slopeAngle && slopeAngle <= 60)
+            // From from `minAngleToLongSlide` to `forceSlideLimit`, player can continuous / long side and stop at will.
+            // From `forceSlideLimit` to `steepLimit` force slide on contact, no longer cancellable, but still can jump
+            if (minAngleToLongSlide <= slopeAngle && slopeAngle <= steepLimit)
                 slopeCanLongSlide = true;
             else
                 slopeCanLongSlide = false;
 
-            if (slopeAngle > 60)
+            if (slopeAngle > steepLimit)
                 slopeVerySteep = true;
             else
                 slopeVerySteep = false;
@@ -277,13 +278,23 @@ public class FPSController : MonoBehaviour
             slopeAngle = -1f;
             slopeCanLongSlide = false;
             slopeVerySteep = false;
-            slopeCanWalk = false;
         }
 
         if (slopeVerySteep)
         {
-            controller.Move(slopeNormal * 1f * Time.deltaTime);
+            // Use jump/ falling animation
+
+            // jump large value make it jittery
+            // -y to make sure it stick to its surface
+            controller.Move(new Vector3(slopeNormal.x, -2f, slopeNormal.z) * 5f * Time.deltaTime);
             airTimer = coyoteTime + 1f; // prevent coyote jump
+        }
+
+        if (slopeCanLongSlide && (slopeAngle > forceSlideLimit || isCrouching))
+        {
+            // Use slide animation
+            isCrouching = true;
+            controller.Move(new Vector3(slopeNormal.x, -2f, slopeNormal.z) * sprintSpeed * Time.deltaTime);
         }
     }
 
@@ -500,11 +511,17 @@ public class FPSController : MonoBehaviour
         // move the character controller downward first
         //isGrounded = Physics.CheckSphere(groundCheck.position, 0.4f, groundMask);
         velocity.y += gravity * Time.deltaTime;
+        velocity.x = Mathf.Lerp(velocity.x, 0, 0.005f);
+        velocity.z = Mathf.Lerp(velocity.z, 0, 0.005f);
+
         velocity.y = Mathf.Clamp(velocity.y, maxGravity, float.MaxValue);
         controller.Move(velocity * Time.deltaTime);
         reliableIsGrouned = controller.isGrounded;
         if (reliableIsGrouned)
         {
+            velocity.x = 0f;
+            velocity.z = 0f;
+
             if (velocity.y < 0)
             {
                 // The velocty.y need to be negative so controller.isGrounded
@@ -555,6 +572,11 @@ public class FPSController : MonoBehaviour
             wallJumpTimer -= Time.deltaTime;
         }
 
+        if (isCrouching && slopeCanLongSlide)
+        {
+            move.z = 0f;
+        }
+
         if (!isWallRunning)
             move = Vector3.ClampMagnitude(move, 1);
         smoothMove = Vector3.Lerp(smoothMove, move, Time.deltaTime * 5f);
@@ -598,13 +620,17 @@ public class FPSController : MonoBehaviour
         // Jump
         if (Input.GetKeyDown(KeyCode.Space) && !slopeVerySteep)
         {
-            Debug.Log(airTimer);
             if (reliableIsGrouned || airTimer <= coyoteTime || isWallRunning)
             {
                 if (isWallRunning)
                     bonusJumpForce = jumpHeight / 5;
                 else
                     bonusJumpForce = 0f;
+                if (isCrouching && slopeCanLongSlide)
+                {
+                    velocity.x = slopeNormal.x * sprintSpeed * jumpHeight / 2;
+                    velocity.z = slopeNormal.z * sprintSpeed * jumpHeight / 2;
+                }
                 velocity.y = Mathf.Sqrt((jumpHeight + bonusJumpForce) * -2f * gravity);
                 isCrouching = false;
 
