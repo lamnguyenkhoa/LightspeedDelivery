@@ -43,8 +43,11 @@ public class FPSController : MonoBehaviour
     private bool reliableIsGrouned; // because controller.isGrounded is damn unreliable
     private float coyoteTime = 0.2f;
     private float airTimer = 0f;
-    private bool isCrouching;
-    private float slideMaxTime = 2f;
+    [SerializeField] private bool isCrouching;
+    [SerializeField] private bool isSliding;
+    [SerializeField] private bool isSlopeSliding;
+
+    public float slideMaxTime = 1.5f;
     private float slideTimer = 0f;
 
     [Space, Header("Slope")]
@@ -65,7 +68,7 @@ public class FPSController : MonoBehaviour
     private float currentPower;
     public Slider powerSlider;
     public float dashCost = 25f;
-    private float powerRecovery = 50f;
+    public float powerRecovery = 50f;
     public float timeInSunrayForm = 0.5f;
     private float timer;
     private bool isAiming = false;
@@ -216,7 +219,6 @@ public class FPSController : MonoBehaviour
 
     private void HandleSlope()
     {
-        slopeNormal = Vector3.zero;
         if (reliableIsGrouned)
         {
             // Check raycast downward
@@ -260,6 +262,7 @@ public class FPSController : MonoBehaviour
                 slopeAngle = -2f;
                 slopeCanLongSlide = false;
                 slopeVerySteep = true;
+                slopeNormal = Vector3.zero;
             }
 
             // From from `minAngleToLongSlide` to `forceSlideLimit`, player can continuous / long side and stop at will.
@@ -279,6 +282,7 @@ public class FPSController : MonoBehaviour
             slopeAngle = -1f;
             slopeCanLongSlide = false;
             slopeVerySteep = false;
+            isSlopeSliding = false;
         }
 
         if (slopeVerySteep)
@@ -291,11 +295,15 @@ public class FPSController : MonoBehaviour
             airTimer = coyoteTime + 1f; // prevent coyote jump
         }
 
-        if (slopeCanLongSlide && slideTimer <= 0 && (slopeAngle > forceSlideLimit || isCrouching))
+        if (slopeCanLongSlide)
         {
-            // Use slide animation
-            isCrouching = true;
-            controller.Move(new Vector3(slopeNormal.x, -2f, slopeNormal.z) * sprintSpeed * Time.deltaTime);
+            if ((slopeAngle > forceSlideLimit) || (isSliding && Vector3.Angle(slopeNormal, transform.forward) < 95))
+            {
+                // Use slide animation
+                isSlopeSliding = true;
+                slideTimer = slideMaxTime;
+                controller.Move(new Vector3(slopeNormal.x, -2f, slopeNormal.z) * sprintSpeed * Time.deltaTime);
+            }
         }
     }
 
@@ -333,6 +341,8 @@ public class FPSController : MonoBehaviour
             if (isCrouching)
             {
                 isCrouching = false;
+                isSliding = false;
+                isSlopeSliding = false;
                 slideTimer = 0f;
             }
             else
@@ -563,7 +573,17 @@ public class FPSController : MonoBehaviour
         if (slideTimer > 0f)
         {
             move.z = 1f;
+            isSliding = true;
             slideTimer -= Time.deltaTime;
+        }
+        else
+        {
+            if (isSliding)
+            {
+                isSlopeSliding = false;
+                isCrouching = false;
+                isSliding = false;
+            }
         }
 
         if (wallJumpTimer > 0f)
@@ -573,9 +593,10 @@ public class FPSController : MonoBehaviour
             wallJumpTimer -= Time.deltaTime;
         }
 
-        if (isCrouching && slopeCanLongSlide)
+        if (isSlopeSliding)
         {
             move.z = 0f;
+            smoothMove = move;
         }
 
         if (!isWallRunning)
