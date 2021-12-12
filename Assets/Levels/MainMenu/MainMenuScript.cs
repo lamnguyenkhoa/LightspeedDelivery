@@ -5,6 +5,9 @@ using UnityEngine.SceneManagement;
 
 public class MainMenuScript : MonoBehaviour
 {
+    public GameObject creditTextObj;
+    private bool creditIsActive = false;
+
     public void StartGameButton()
     {
         SceneManager.LoadScene("CityTest");
@@ -12,6 +15,16 @@ public class MainMenuScript : MonoBehaviour
 
     public void CreditButton()
     {
+        if (!creditIsActive)
+        {
+            creditTextObj.SetActive(true);
+            creditIsActive = true;
+        }
+        else
+        {
+            creditTextObj.SetActive(false);
+            creditIsActive = false;
+        }
     }
 
     public void ExitGameButton()
