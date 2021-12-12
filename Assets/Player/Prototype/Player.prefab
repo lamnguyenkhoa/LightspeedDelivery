@@ -2070,10 +2070,23 @@ MonoBehaviour:
   glassMask:
     serializedVersion: 2
     m_Bits: 512
+  velocity: {x: 0, y: 0, z: 0}
+  isCrouching: 0
+  isSliding: 0
+  isSlopeSliding: 0
+  slideMaxTime: 1.5
+  slopeAngle: 0
+  slopeCanLongSlide: 0
+  slopeVerySteep: 0
+  minAngleToLongSlide: 15
+  forceSlideLimit: 45
+  steepLimit: 60
+  rayDetectionDistance: 1.5
   sunraySpeed: 40
   maxPower: 100
   powerSlider: {fileID: 576655567}
   dashCost: 25
+  powerRecovery: 50
   timeInSunrayForm: 0.4
   resetCameraAfterDash: 0
   maxFOV: 90

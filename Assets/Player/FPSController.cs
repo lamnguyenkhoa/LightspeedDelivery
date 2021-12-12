@@ -13,6 +13,8 @@ public class FPSController : MonoBehaviour
     [Space, Header("Camera")]
     public float mouseSensitivity = 100f;
     public Camera mainCamera;
+    public float xRotation;
+    public Transform headPos;
 
     // Headbob
     private float amplitude;
@@ -35,7 +37,6 @@ public class FPSController : MonoBehaviour
     private Vector3 smoothMove;
     private Vector3 finalMove;
     public LayerMask glassMask;
-    private float xRotation;
     private bool isRunning;
     public Vector3 velocity; // environmental stuff affect player movement
     private Vector3 dashDirection;
@@ -112,14 +113,14 @@ public class FPSController : MonoBehaviour
     public float wallRunCost = 10f;
     private bool isWallLeft, isWallRight;
     public bool isWallRunning;
-    private float wallRunCameraTilt;
+    public float wallRunCameraTilt;
     public float maxWallRunCameraTilt;
     public float wallJumpLockControlTime = 1f; // disable player control in this amount of time
     private float wallJumpTimer;
     private float wallJumpDirection; // which side the player will jump toward, either -1 or 1
 
     [Space, Header("Animation")]
-    private Animator anim;
+    public Animator anim;
 
     private enum State
     { idle, walking, running, jumping, slide, crouching, land }
@@ -138,7 +139,6 @@ public class FPSController : MonoBehaviour
 
     {
         controller = GetComponent<CharacterController>();
-        anim = GetComponent<Animator>();
         Cursor.lockState = CursorLockMode.Locked;
         velocity = Vector3.zero;
         startFOV = mainCamera.fieldOfView;
@@ -157,7 +157,7 @@ public class FPSController : MonoBehaviour
         {
             mainCamera.fieldOfView = Mathf.Lerp(mainCamera.fieldOfView, maxFOV, 0.05f);
 
-            //mainCamera.transform.forward = Vector3.Lerp(mainCamera.transform.forward, dashDirection, 0.05f);
+            mainCamera.transform.forward = Vector3.Lerp(mainCamera.transform.forward, dashDirection, 0.05f);
 
             Vector3 dashEulerRotation = Quaternion.LookRotation(dashDirection).eulerAngles;
             // Update xRotation so when player go back to Human Form it doesn't reset the camera
@@ -188,6 +188,8 @@ public class FPSController : MonoBehaviour
 
             HandleSlope();
 
+            HandleAnimationSyncedHeadBob();
+
             HandleMovement();
 
             HandleAnimation();
@@ -199,13 +201,15 @@ public class FPSController : MonoBehaviour
 
             HandleGravity();
 
-            HandleLanding();
+            //HandleLanding();
 
-            HandleHeadBob();
+            //HandleHeadBob();
 
             HandleSpecialAbilities();
 
             HandleShootGun();
+
+            HandleAnimation();
 
             UpdateGUI();
 
@@ -216,6 +220,12 @@ public class FPSController : MonoBehaviour
     #endregion UnityCallbacks
 
     #region MainFunctions
+
+    private void HandleAnimationSyncedHeadBob()
+    {
+        mainCamera.transform.position = Vector3.Lerp(mainCamera.transform.position, headPos.transform.position, 0.1f);
+        mainCamera.transform.rotation = Quaternion.Slerp(mainCamera.transform.rotation, headPos.transform.rotation, 0.1f);
+    }
 
     private void HandleSlope()
     {
@@ -309,29 +319,9 @@ public class FPSController : MonoBehaviour
 
     private void HandleAnimation()
     {
-        float finalMoveMagnitude = finalMove.magnitude;
-        if (!reliableIsGrouned && !isWallRunning)
-        {
-            state = State.jumping;
-        }
-        else if (finalMoveMagnitude <= 0.5f)
-        {
-            state = State.idle;
-        }
-        else if (slideTimer > 0f)
-        {
-            state = State.slide;
-        }
-        else if (isRunning)
-        {
-            state = State.running;
-        }
-        else
-        {
-            state = State.walking;
-        }
-
-        anim.SetInteger("state", (int)state);
+        anim.SetFloat("WalkForward", move.z, 1f, Time.deltaTime * 3f);
+        anim.SetFloat("WalkRight", move.x, 1f, Time.deltaTime * 3f);
+        anim.SetFloat("HeadLook", (xRotation + 90f) / 180f, 1f, Time.deltaTime * 10f);
     }
 
     private void HandleCrouch()
@@ -857,14 +847,14 @@ public class FPSController : MonoBehaviour
     private IEnumerator CameraJumpLanding(float fallSpeed)
     {
         isLanding = true;
-        float downYPos = 0.2f;
+        float downYPos = -0.1f;
         if (fallSpeed >= 16f)
-            downYPos = -0.5f;
+            downYPos = -0.3f;
 
         float upDuration = 0.3f;
         float downDuration = 0.15f;
 
-        float delta = (downYPos - startCameraPos.y) / downDuration;
+        float delta = downYPos / downDuration;
         float timer = 0f;
         while (timer < downDuration)
         {
@@ -876,7 +866,7 @@ public class FPSController : MonoBehaviour
         if (fallSpeed >= 16f)
             yield return new WaitForSeconds(0.1f);
 
-        delta = (startCameraPos.y - downYPos) / upDuration;
+        delta = -downYPos / upDuration;
         timer = 0f;
         while (timer < upDuration)
         {
