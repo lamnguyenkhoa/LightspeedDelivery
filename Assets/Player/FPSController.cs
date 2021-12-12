@@ -813,7 +813,7 @@ public class FPSController : MonoBehaviour
         RaycastHit hit;
         bool continueBounce = false;
 
-        if (Physics.Raycast(ray, out hit, sunraySpeed * timeInSunrayForm, ~glassMask))
+        if (Physics.Raycast(ray, out hit, sunraySpeed * timeInSunrayForm, ~glassMask, QueryTriggerInteraction.Ignore))
         {
             if (hit.collider.gameObject.tag == "Mirror")
             {
@@ -905,13 +905,4 @@ public class FPSController : MonoBehaviour
     }
 
     #endregion Coroutine
-
-    #region AnimationEvents
-
-    public void PlayFootstep()
-    {
-        AudioManager.instance.PlayFootstep();
-    }
-
-    #endregion AnimationEvents
 }
