@@ -23,6 +23,8 @@ public class LevelManager : MonoBehaviour
 
     private void Start()
     {
-        player = GameObject.Find("Player").GetComponent<FPSController>();
+        player = GameObject.Find("PlayerLloyd").GetComponent<FPSController>();
+        if (!player)
+            player = GameObject.Find("Player").GetComponent<FPSController>();
     }
 }

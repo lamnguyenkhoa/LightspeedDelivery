@@ -21,7 +21,6 @@ public class FPSController : MonoBehaviour
     private float frequency;
     private Vector3 startCameraPos;
     private bool isLanding = false;
-    private bool justFall = false;
     private float maxAchievedFallSpeed = 0f;
 
     [Space, Header("Movement")]
@@ -43,7 +42,7 @@ public class FPSController : MonoBehaviour
     private CharacterController controller;
     private bool reliableIsGrouned; // because controller.isGrounded is damn unreliable
     private float coyoteTime = 0.2f;
-    private float airTimer = 0f;
+    public float airTimer = 0f;
     [SerializeField] private bool isCrouching;
     [SerializeField] private bool isSliding;
     [SerializeField] private bool isSlopeSliding;
@@ -78,7 +77,6 @@ public class FPSController : MonoBehaviour
     private float startFOV;
     public GameObject characterModel;
     public GameObject sunrayModel;
-    public GameObject sunTrailPrefab;
     public LineRenderer aimRenderer;
 
     // Use int instead of bool to prevent edge case bug
@@ -121,6 +119,8 @@ public class FPSController : MonoBehaviour
 
     [Space, Header("Animation")]
     public Animator anim;
+    public bool justJump;
+    public bool isFalling;
 
     private enum State
     { idle, walking, running, jumping, slide, crouching, land }
@@ -322,6 +322,30 @@ public class FPSController : MonoBehaviour
         anim.SetFloat("WalkForward", move.z, 1f, Time.deltaTime * 3f);
         anim.SetFloat("WalkRight", move.x, 1f, Time.deltaTime * 3f);
         anim.SetFloat("HeadLook", (xRotation + 90f) / 180f, 1f, Time.deltaTime * 10f);
+
+        if (justJump)
+        {
+            // Jump up, trigger
+            anim.SetTrigger("jump");
+            justJump = false;
+        }
+
+        if (isFalling && airTimer > 0.5f)
+        {
+            // Idle falling
+            anim.SetBool("isFalling", true);
+        }
+
+        if (reliableIsGrouned && isFalling)
+        {
+            // Landing
+            isFalling = false;
+            airTimer = 0f;
+            anim.SetBool("isFalling", false);
+            maxAchievedFallSpeed = 0f;
+            anim.ResetTrigger("jump");
+            justJump = false;
+        }
     }
 
     private void HandleCrouch()
@@ -479,16 +503,16 @@ public class FPSController : MonoBehaviour
 
     private void HandleLanding()
     {
-        if (justFall && reliableIsGrouned)
-        {
-            justFall = false;
-            airTimer = 0f;
-            if (maxAchievedFallSpeed > 8f)
-            {
-                StartCoroutine(CameraJumpLanding(maxAchievedFallSpeed));
-            }
-            maxAchievedFallSpeed = 0f;
-        }
+        //if (justFall && reliableIsGrouned)
+        //{
+        //    justFall = false;
+        //    airTimer = 0f;
+        //    if (maxAchievedFallSpeed > 8f)
+        //    {
+        //        StartCoroutine(CameraJumpLanding(maxAchievedFallSpeed));
+        //    }
+        //    maxAchievedFallSpeed = 0f;
+        //}
     }
 
     private void HandleCamera()
@@ -537,7 +561,7 @@ public class FPSController : MonoBehaviour
             // Prevent character jittering when jump and move forward
             // near an wall's edge
             controller.stepOffset = 0f;
-            justFall = true;
+            isFalling = true;
             airTimer += Time.deltaTime;
             maxAchievedFallSpeed = Mathf.Max(maxAchievedFallSpeed, -velocity.y);
         }
@@ -634,10 +658,15 @@ public class FPSController : MonoBehaviour
         {
             if (reliableIsGrouned || airTimer <= coyoteTime || isWallRunning)
             {
+                justJump = true;
+
+                // Bonus jump height while wallrunning
                 if (isWallRunning)
                     bonusJumpForce = jumpHeight / 5;
                 else
                     bonusJumpForce = 0f;
+
+                // Bonus jump length from slide momentum
                 if (isCrouching && slopeCanLongSlide)
                 {
                     velocity.x = slopeNormal.x * sprintSpeed * jumpHeight / 2;
@@ -707,8 +736,6 @@ public class FPSController : MonoBehaviour
 
     private void SunrayDash()
     {
-        //GameObject sunTrail = Instantiate(sunTrailPrefab, this.transform, true);
-        //sunTrail.transform.localPosition = Vector3.zero;
         controller.Move(dashDirection * sunraySpeed * Time.deltaTime);
 
         // Check to see if in front of player is mirror
@@ -737,8 +764,6 @@ public class FPSController : MonoBehaviour
                 HumanForm();
             }
         }
-
-        //sunTrail.transform.parent = null;
     }
 
     private void SunrayForm()
