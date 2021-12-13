@@ -26,11 +26,6 @@ public class AudioManager : MonoBehaviour
         }
     }
 
-    private void Start()
-    {
-        bgm.Play();
-    }
-
     public void PlayFootstep()
     {
         float randomPitch = Random.Range(0.8f, 1.2f);
