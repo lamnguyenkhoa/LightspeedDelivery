@@ -8,4 +8,9 @@ public class LloydAnimationEvents : MonoBehaviour
     {
         AudioManager.instance.PlayFootstep();
     }
+
+    public void PlayLanding()
+    {
+        AudioManager.instance.PlayLanding();
+    }
 }

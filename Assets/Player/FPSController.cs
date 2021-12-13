@@ -452,6 +452,7 @@ public class FPSController : MonoBehaviour
         {
             if (currentShootForce >= minShootForce && currentFoodBag >= 1)
             {
+                AudioManager.instance.PlayFoodSplat();
                 FoodBagScript newFoodBag = Instantiate(foodBagPrefab, foodGun.transform.position, Quaternion.Euler(new Vector3(-90, 0, 0)));
                 newFoodBag.shootDirection = mainCamera.transform.forward;
                 newFoodBag.shootForce = currentShootForce;
@@ -486,6 +487,7 @@ public class FPSController : MonoBehaviour
         {
             if (currentPower >= dashCost)
             {
+                AudioManager.instance.PlayDash();
                 currentPower -= dashCost;
                 SunrayForm();
                 aimRenderer.positionCount = 0;
@@ -745,6 +747,7 @@ public class FPSController : MonoBehaviour
         {
             if (hit.collider.gameObject.tag == "Mirror")
             {
+                AudioManager.instance.PlayDash();
                 Vector3 reflectDirection = Vector3.Reflect(dashDirection, hit.normal);
                 transform.position = hit.point;
                 dashDirection = reflectDirection;

@@ -97,7 +97,7 @@ LightmapSettings:
     m_ExportTrainingData: 0
     m_TrainingDataDestination: TrainingData
     m_LightProbeSampleCountMultiplier: 4
-  m_LightingDataAsset: {fileID: 0}
+  m_LightingDataAsset: {fileID: 112000000, guid: c9d60fd13fd23f84aa83515246c3d7dd, type: 2}
   m_LightingSettings: {fileID: 838720856}
 --- !u!196 &4
 NavMeshSettings:
@@ -41984,7 +41984,7 @@ LightingSettings:
   m_PrefabAsset: {fileID: 0}
   m_Name: 
   serializedVersion: 3
-  m_GIWorkflowMode: 0
+  m_GIWorkflowMode: 1
   m_EnableBakedLightmaps: 1
   m_EnableRealtimeLightmaps: 0
   m_RealtimeEnvironmentLighting: 1
@@ -62714,6 +62714,78 @@ PrefabInstance:
   m_Modification:
     m_TransformParent: {fileID: 0}
     m_Modifications:
+    - target: {fileID: 6537709386717456200, guid: 0bbdd7d867891ab489c426da921c62a9, type: 3}
+      propertyPath: m_SizeDelta.x
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 6537709386717456200, guid: 0bbdd7d867891ab489c426da921c62a9, type: 3}
+      propertyPath: m_SizeDelta.y
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 6537709387267488380, guid: 0bbdd7d867891ab489c426da921c62a9, type: 3}
+      propertyPath: m_AnchorMax.y
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 6537709387267488380, guid: 0bbdd7d867891ab489c426da921c62a9, type: 3}
+      propertyPath: m_AnchorMin.y
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 6537709387267488380, guid: 0bbdd7d867891ab489c426da921c62a9, type: 3}
+      propertyPath: m_SizeDelta.x
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 6537709387267488380, guid: 0bbdd7d867891ab489c426da921c62a9, type: 3}
+      propertyPath: m_SizeDelta.y
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 6537709387267488380, guid: 0bbdd7d867891ab489c426da921c62a9, type: 3}
+      propertyPath: m_AnchoredPosition.x
+      value: 134.795
+      objectReference: {fileID: 0}
+    - target: {fileID: 6537709387267488380, guid: 0bbdd7d867891ab489c426da921c62a9, type: 3}
+      propertyPath: m_AnchoredPosition.y
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 6537709387656783647, guid: 0bbdd7d867891ab489c426da921c62a9, type: 3}
+      propertyPath: m_AnchorMax.x
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 6537709387656783647, guid: 0bbdd7d867891ab489c426da921c62a9, type: 3}
+      propertyPath: m_AnchorMax.y
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 6537709387840815947, guid: 0bbdd7d867891ab489c426da921c62a9, type: 3}
+      propertyPath: m_AnchorMax.y
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 6537709388478863912, guid: 0bbdd7d867891ab489c426da921c62a9, type: 3}
+      propertyPath: m_AnchorMax.y
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 6537709388643306132, guid: 0bbdd7d867891ab489c426da921c62a9, type: 3}
+      propertyPath: m_AnchorMax.y
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 6537709388643306132, guid: 0bbdd7d867891ab489c426da921c62a9, type: 3}
+      propertyPath: m_AnchorMin.y
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 6537709388643306132, guid: 0bbdd7d867891ab489c426da921c62a9, type: 3}
+      propertyPath: m_SizeDelta.x
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 6537709388643306132, guid: 0bbdd7d867891ab489c426da921c62a9, type: 3}
+      propertyPath: m_SizeDelta.y
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 6537709388643306132, guid: 0bbdd7d867891ab489c426da921c62a9, type: 3}
+      propertyPath: m_AnchoredPosition.x
+      value: 158.23999
+      objectReference: {fileID: 0}
+    - target: {fileID: 6537709388643306132, guid: 0bbdd7d867891ab489c426da921c62a9, type: 3}
+      propertyPath: m_AnchoredPosition.y
+      value: 0
+      objectReference: {fileID: 0}
     - target: {fileID: 8506846800919694611, guid: 0bbdd7d867891ab489c426da921c62a9, type: 3}
       propertyPath: m_Name
       value: PlayerLloyd

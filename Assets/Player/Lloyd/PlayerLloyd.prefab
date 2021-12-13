@@ -3840,12 +3840,12 @@ MonoBehaviour:
   forceSlideLimit: 45
   steepLimit: 60
   rayDetectionDistance: 1.5
-  sunraySpeed: 40
+  sunraySpeed: 50
   maxPower: 100
   powerSlider: {fileID: 6537709387761773470}
   dashCost: 50
   powerRecovery: 100
-  timeInSunrayForm: 0.4
+  timeInSunrayForm: 0.5
   resetCameraAfterDash: 0
   maxFOV: 90
   characterModel: {fileID: 8506846802434424828}
