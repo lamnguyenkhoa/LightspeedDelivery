@@ -14,17 +14,13 @@ public class LevelManager : MonoBehaviour
         if (!instance)
         {
             instance = this;
+            player = GameObject.Find("PlayerLloyd").GetComponent<FPSController>();
+            if (!player)
+                player = GameObject.Find("Player").GetComponent<FPSController>();
         }
         else
         {
             Destroy(this.gameObject);
         }
-    }
-
-    private void Start()
-    {
-        player = GameObject.Find("PlayerLloyd").GetComponent<FPSController>();
-        if (!player)
-            player = GameObject.Find("Player").GetComponent<FPSController>();
     }
 }

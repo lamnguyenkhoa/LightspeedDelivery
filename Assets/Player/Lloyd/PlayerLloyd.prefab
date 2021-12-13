@@ -3844,7 +3844,7 @@ MonoBehaviour:
   maxPower: 100
   powerSlider: {fileID: 6537709387761773470}
   dashCost: 50
-  powerRecovery: 50
+  powerRecovery: 100
   timeInSunrayForm: 0.4
   resetCameraAfterDash: 0
   maxFOV: 90

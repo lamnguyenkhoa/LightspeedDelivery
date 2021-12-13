@@ -9,7 +9,7 @@ EditorBuildSettings:
     path: Assets/Levels/MainMenu/MainMenu.unity
     guid: c83869a6c9dc4314693e36522af8c8f3
   - enabled: 0
-    path: Assets/Levels/TestFPSMovement.unity
+    path: Assets/Levels/TestFPSMovement/TestFPSMovement.unity
     guid: fcbde5f8cb091394ea578a1a4a596d6b
   - enabled: 0
     path: Assets/Levels/Playgrounds/ProbuilderTest.unity
