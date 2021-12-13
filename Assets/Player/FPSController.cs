@@ -4,6 +4,7 @@ using System.Collections.Generic;
 using TMPro;
 using UnityEditor;
 using UnityEngine;
+using UnityEngine.SceneManagement;
 using UnityEngine.UI;
 
 public class FPSController : MonoBehaviour
@@ -16,11 +17,6 @@ public class FPSController : MonoBehaviour
     public float xRotation;
     public Transform headPos;
 
-    // Headbob
-    private float amplitude;
-    private float frequency;
-    private Vector3 startCameraPos;
-    private bool isLanding = false;
     private float maxAchievedFallSpeed = 0f;
 
     [Space, Header("Movement")]
@@ -122,9 +118,9 @@ public class FPSController : MonoBehaviour
     public bool justJump;
     public bool isFalling;
 
-    private enum State
-    { idle, walking, running, jumping, slide, crouching, land }
-    private State state;
+    [Space, Header("Pause Menu")]
+    public bool isPaused;
+    public GameObject pauseMenu;
 
     #endregion Variables
 
@@ -143,16 +139,16 @@ public class FPSController : MonoBehaviour
         velocity = Vector3.zero;
         startFOV = mainCamera.fieldOfView;
         currentPower = 0f;
-        startCameraPos = mainCamera.transform.localPosition;
         nPlantInRange = 0;
         currentFoodBag = requiredDeliveryAmount;
         currentStamina = maxStamina;
-        state = State.idle;
         isCrouching = false;
     }
 
     private void Update()
     {
+        HandlePause();
+
         if (inSunrayForm)
         {
             mainCamera.fieldOfView = Mathf.Lerp(mainCamera.fieldOfView, maxFOV, 0.05f);
@@ -220,6 +216,27 @@ public class FPSController : MonoBehaviour
     #endregion UnityCallbacks
 
     #region MainFunctions
+
+    private void HandlePause()
+    {
+        if (Input.GetKeyDown(KeyCode.Escape))
+        {
+            if (!isPaused)
+            {
+                isPaused = true;
+                pauseMenu.SetActive(true);
+                Time.timeScale = 0f;
+                Cursor.lockState = CursorLockMode.None;
+            }
+            else
+            {
+                isPaused = false;
+                pauseMenu.SetActive(false);
+                Time.timeScale = 1f;
+                Cursor.lockState = CursorLockMode.Locked;
+            }
+        }
+    }
 
     private void HandleAnimationSyncedHeadBob()
     {
@@ -503,20 +520,6 @@ public class FPSController : MonoBehaviour
         }
     }
 
-    private void HandleLanding()
-    {
-        //if (justFall && reliableIsGrouned)
-        //{
-        //    justFall = false;
-        //    airTimer = 0f;
-        //    if (maxAchievedFallSpeed > 8f)
-        //    {
-        //        StartCoroutine(CameraJumpLanding(maxAchievedFallSpeed));
-        //    }
-        //    maxAchievedFallSpeed = 0f;
-        //}
-    }
-
     private void HandleCamera()
     {
         mainCamera.fieldOfView = Mathf.Lerp(mainCamera.fieldOfView, startFOV, 0.05f);
@@ -627,8 +630,6 @@ public class FPSController : MonoBehaviour
         if (isRunning)
         {
             currentSpeed = sprintSpeed;
-            frequency = 20f;
-            amplitude = 1.8f;
         }
         else if (isCrouching)
         {
@@ -637,8 +638,6 @@ public class FPSController : MonoBehaviour
         else
         {
             currentSpeed = moveSpeed;
-            amplitude = 1.2f;
-            frequency = 15f;
         }
 
         // Directional modifier
@@ -690,26 +689,6 @@ public class FPSController : MonoBehaviour
         }
     }
 
-    private void HandleHeadBob()
-    {
-        if (isLanding) return;
-
-        if (finalMove.magnitude < 8f || (!reliableIsGrouned && !isWallRunning) || isCrouching)
-        {
-            // Reset position
-            if (mainCamera.transform.localPosition == startCameraPos) return;
-            mainCamera.transform.localPosition = Vector3.Lerp(mainCamera.transform.localPosition, startCameraPos, 5 * Time.deltaTime);
-        }
-        else
-        {
-            Vector3 headbobPos = Vector3.zero;
-            headbobPos.y += Mathf.Sin(Time.time * frequency) * amplitude;
-            headbobPos.x += Mathf.Sin(Time.time * frequency / 2) * amplitude;
-
-            mainCamera.transform.localPosition += headbobPos * Time.deltaTime;
-        }
-    }
-
     private void UpdateGUI()
     {
         // Also prevent currentPower from going beyond maxPower
@@ -722,14 +701,6 @@ public class FPSController : MonoBehaviour
 
         deliveredText.text = "Delivered: " + playerStats.deliveredAmount + "/" + requiredDeliveryAmount;
         foodBagLeftText.text = "Food bags left: " + currentFoodBag;
-    }
-
-    /// <summary>
-    /// This function will be deprecated when we has player model
-    /// and player walk/run animation
-    /// </summary>
-    private void HandleFootstepSound()
-    {
     }
 
     #endregion MainFunctions
@@ -855,6 +826,13 @@ public class FPSController : MonoBehaviour
         Gizmos.DrawRay(transform.position, transform.right);
     }
 
+    public void GoBackToMainMenu()
+    {
+        Time.timeScale = 1f;
+        isPaused = false;
+        SceneManager.LoadScene("MainMenu");
+    }
+
     #endregion SubFuctions
 
     #region Coroutine
@@ -869,41 +847,6 @@ public class FPSController : MonoBehaviour
             xRotation = Mathf.Lerp(xRotation, 0f, 0.08f);
             yield return null;
         }
-        yield return null;
-    }
-
-    private IEnumerator CameraJumpLanding(float fallSpeed)
-    {
-        isLanding = true;
-        float downYPos = -0.1f;
-        if (fallSpeed >= 16f)
-            downYPos = -0.3f;
-
-        float upDuration = 0.3f;
-        float downDuration = 0.15f;
-
-        float delta = downYPos / downDuration;
-        float timer = 0f;
-        while (timer < downDuration)
-        {
-            timer += Time.deltaTime;
-            mainCamera.transform.localPosition += new Vector3(0, delta, 0) * Time.deltaTime;
-            yield return null;
-        }
-
-        if (fallSpeed >= 16f)
-            yield return new WaitForSeconds(0.1f);
-
-        delta = -downYPos / upDuration;
-        timer = 0f;
-        while (timer < upDuration)
-        {
-            timer += Time.deltaTime;
-            mainCamera.transform.localPosition += new Vector3(0, delta, 0) * Time.deltaTime;
-            yield return null;
-        }
-
-        isLanding = false;
         yield return null;
     }
 
