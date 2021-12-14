@@ -6,17 +6,17 @@ public class LevelManager : MonoBehaviour
 {
     public static LevelManager instance;
 
-    [HideInInspector]
-    public FPSController player;
+    // [HideInInspector]
+    // public Player player;
 
     private void Awake()
     {
         if (!instance)
         {
             instance = this;
-            player = GameObject.Find("PlayerLloyd").GetComponent<FPSController>();
-            if (!player)
-                player = GameObject.Find("Player").GetComponent<FPSController>();
+            // player = GameObject.Find("PlayerLloyd").GetComponent<Player>();
+            // if (!player)
+            //     player = GameObject.Find("Player").GetComponent<Player>();
         }
         else
         {
