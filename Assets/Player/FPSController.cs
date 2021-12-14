@@ -649,7 +649,7 @@ public class FPSController : MonoBehaviour
         if (slideTimer > 0f)
             smoothSpeed = Mathf.Lerp(smoothSpeed, currentSpeed, 0.005f);
         else
-            smoothSpeed = Mathf.Lerp(smoothSpeed, currentSpeed, 0.05f);
+            smoothSpeed = Mathf.Lerp(smoothSpeed, currentSpeed, 0.1f);
 
         finalMove = (smoothMove.x * transform.right + smoothMove.z * transform.forward) * smoothSpeed;
         controller.Move(finalMove * Time.deltaTime);
