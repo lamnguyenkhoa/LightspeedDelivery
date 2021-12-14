@@ -240,7 +240,7 @@ public class FPSController : MonoBehaviour
 
     private void HandleAnimationSyncedHeadBob()
     {
-        mainCamera.transform.position = Vector3.Lerp(mainCamera.transform.position, headPos.transform.position, 0.1f);
+        mainCamera.transform.position = Vector3.Lerp(mainCamera.transform.position, headPos.transform.position, 0.05f);
         // mainCamera.transform.rotation = Quaternion.Slerp(mainCamera.transform.rotation, headPos.transform.rotation, 0.1f);
     }
 
@@ -347,7 +347,7 @@ public class FPSController : MonoBehaviour
             justJump = false;
         }
 
-        if (isFalling && airTimer > 0.5f)
+        if (isFalling && airTimer > coyoteTime)
         {
             // Idle falling
             anim.SetBool("isFalling", true);
