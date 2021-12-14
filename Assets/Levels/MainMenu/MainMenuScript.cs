@@ -69,6 +69,11 @@ public class MainMenuScript : MonoBehaviour
         SceneManager.LoadScene("CityTest");
     }
 
+    public void FreeplayLevelButton()
+    {
+        SceneManager.LoadScene("Freeplay");
+    }
+
     public void ExitGameButton()
     {
         Application.Quit();
