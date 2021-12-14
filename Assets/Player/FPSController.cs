@@ -413,8 +413,8 @@ public class FPSController : MonoBehaviour
             isWallRunning = false;
 
         // Start wallrun
-        if ((Input.GetKey(KeyCode.D) && isWallRight) ||
-            (Input.GetKey(KeyCode.A) && isWallLeft))
+        if (((Input.GetKey(KeyCode.D) && isWallRight) ||
+            (Input.GetKey(KeyCode.A) && isWallLeft)) && Input.GetKeyDown(KeyCode.Space))
         {
             isWallRunning = true;
         }
