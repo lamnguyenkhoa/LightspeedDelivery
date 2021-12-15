@@ -11,7 +11,7 @@ GameObject:
   - component: {fileID: 874642967}
   - component: {fileID: 874642969}
   - component: {fileID: 874642968}
-  m_Layer: 10
+  m_Layer: 6
   m_Name: DistanceText
   m_TagString: Untagged
   m_Icon: {fileID: 0}

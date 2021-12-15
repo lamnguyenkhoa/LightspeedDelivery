@@ -14,8 +14,8 @@ public class PlayerMotion : PlayerState
     public float maxGravity = 20f;
 
     [HideInInspector] public Vector2 moveDirection = Vector2.zero;
-    float xRotation = 0;
-    float yRotation = 0;
+    [HideInInspector] public float xRotation = 0;
+    [HideInInspector] public float yRotation = 0;
     [HideInInspector] public Vector3 motion = Vector3.zero;
     [HideInInspector] public Vector3 finalMove = Vector3.zero;
 
@@ -50,8 +50,8 @@ public class PlayerMotion : PlayerState
 
         motion.y = Mathf.Max(motion.y, -maxGravity);
 
-        player.transform.eulerAngles = new Vector3(player.transform.eulerAngles.x, xRotation, player.transform.eulerAngles.z);
-        mainCamera.transform.eulerAngles = new Vector3(yRotation, mainCamera.transform.eulerAngles.y, mainCamera.transform.eulerAngles.z);
+        player.transform.eulerAngles = new Vector3(0, xRotation, 0);
+        mainCamera.transform.localEulerAngles = new Vector3(yRotation, 0, 0);
     }
 
     public override void _Enter()

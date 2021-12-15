@@ -1435,7 +1435,7 @@ Camera:
   m_Depth: 0
   m_CullingMask:
     serializedVersion: 2
-    m_Bits: 1056
+    m_Bits: 96
   m_RenderingPath: -1
   m_TargetTexture: {fileID: 0}
   m_TargetDisplay: 0
@@ -4193,6 +4193,8 @@ MonoBehaviour:
   floorGravity: 2
   maxGravity: 100
   moveDirection: {x: 0, y: 0}
+  xRotation: 0
+  yRotation: 0
   motion: {x: 0, y: 0, z: 0}
   finalMove: {x: 0, y: 0, z: 0}
 --- !u!114 &3202518695506482017
@@ -4255,7 +4257,12 @@ MonoBehaviour:
   mainCamera: {fileID: 0}
   controller: {fileID: 0}
   sunraySpeed: 100
-  sunrayTime: 0.35
+  sunrayTime: 0.5
+  detectionDistance: 1.5
+  smoothRotation: 1000
+  layerMask:
+    serializedVersion: 2
+    m_Bits: 4096
 --- !u!114 &3909436350919302604
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -4292,6 +4299,12 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: faa469f4bd86af245a23f183eb301eae, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  player: {fileID: 0}
+  fsm: {fileID: 0}
+  mainInstances: {fileID: 0}
+  eventsManager: {fileID: 0}
+  mainCamera: {fileID: 0}
+  controller: {fileID: 0}
 --- !u!114 &1997303425841329234
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -4304,6 +4317,12 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 9ad9351820c7bfb47807754c29594e09, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  player: {fileID: 0}
+  fsm: {fileID: 0}
+  mainInstances: {fileID: 0}
+  eventsManager: {fileID: 0}
+  mainCamera: {fileID: 0}
+  controller: {fileID: 0}
 --- !u!1 &8506846801027605395
 GameObject:
   m_ObjectHideFlags: 0
@@ -4609,7 +4628,7 @@ Camera:
   m_Depth: -1
   m_CullingMask:
     serializedVersion: 2
-    m_Bits: 4294966239
+    m_Bits: 4294967263
   m_RenderingPath: -1
   m_TargetTexture: {fileID: 0}
   m_TargetDisplay: 0
