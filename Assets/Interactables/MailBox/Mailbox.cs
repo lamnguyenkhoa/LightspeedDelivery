@@ -27,9 +27,10 @@ public class Mailbox : MonoBehaviour
         {
             float distance = Vector3.Distance(player.position, transform.position);
             if (distance > 250f)
-                return;
+                distanceText.text = distance.ToString("F0") + "m";
+            else
+                distanceText.text = "";
 
-            distanceText.text = distance.ToString("F0") + "m";
             distanceIndicator.transform.localScale = baseScale * (distance / 10) * scaleFactor;
 
             distanceIndicator.transform.LookAt(player);
