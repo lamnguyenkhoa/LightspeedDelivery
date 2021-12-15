@@ -11,6 +11,9 @@ public class PlayerAir : PlayerState
     public float coyoteMaxTime = 0.5f;
     float coyoteTimeCount = 0;
 
+    public float wallCheckTime = 1.0f;
+    bool checkWall = true;
+
     private void Awake() 
     {
         playerMotion = GetComponent<PlayerMotion>();
@@ -18,6 +21,8 @@ public class PlayerAir : PlayerState
 
     public override void _FixedUpdate()
     {
+        if (!checkWall) return;
+
         bool isWallRight = Physics.Raycast(transform.position, transform.right, 1f);
         bool isWallLeft = Physics.Raycast(transform.position, -transform.right, 1f);
 
@@ -45,9 +50,10 @@ public class PlayerAir : PlayerState
         playerMotion._Enter();
         gameControls.Player.Jump.performed += JumpPerformed;
         coyoteTimeCount = 0;
+        checkWall = false;
     }
 
-    public override void _Enter<T>(T msg)
+    public override void _Enter<Boolean>(Boolean fromWall)
     {
         playerMotion._Enter();
         gameControls.Player.Jump.performed += JumpPerformed;
@@ -55,17 +61,31 @@ public class PlayerAir : PlayerState
         coyoteTimeCount = coyoteMaxTime;
         playerMotion.motion.y = 0;
         playerMotion.motion.y = jumpHeight;
+
+        if (fromWall.Equals(true))
+        {
+            checkWall = false;
+            Invoke("SetCheckWall", wallCheckTime);
+        }
+        else
+            checkWall = true;
     }
 
     public override void _Exit()
     {
         playerMotion._Exit();
         gameControls.Player.Jump.performed -= JumpPerformed;
+        CancelInvoke("SetCheckWall");
     }
 
     public void JumpPerformed(InputAction.CallbackContext ctx)
     {
         if (coyoteTimeCount < coyoteMaxTime)
             fsm.TransitionTo<PlayerAir, bool>(true);
+    }
+
+    void SetCheckWall()
+    {
+        checkWall = true;
     }
 }

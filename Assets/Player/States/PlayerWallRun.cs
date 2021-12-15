@@ -47,7 +47,7 @@ public class PlayerWallRun : PlayerState
         playerMotion._Enter();
         gameControls.Player.Jump.performed += JumpPerformed;
 
-        motion = player.transform.forward * wallRunSpeed;
+        motion = player.transform.forward * wallRunSpeed * gameControls.Player.Move.ReadValue<Vector2>().y;
         motion.y = playerMotion.finalMove.y;
 
         if (wallRunRight.Equals(true))
@@ -71,9 +71,10 @@ public class PlayerWallRun : PlayerState
     public void JumpPerformed(InputAction.CallbackContext ctx)
     {
         if (runningRight)
-            playerMotion.motion -= player.transform.right * wallRunSpeed;
+            playerMotion.motion.x = -wallRunSpeed;
         else
-            playerMotion.motion += player.transform.right * wallRunSpeed;
+            playerMotion.motion.x = wallRunSpeed;
+        
         fsm.TransitionTo<PlayerAir, bool>(true);
     }
 }

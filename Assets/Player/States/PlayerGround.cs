@@ -56,7 +56,7 @@ public class PlayerGround : PlayerState
 
     public void JumpPerformed(InputAction.CallbackContext ctx)
     {
-        fsm.TransitionTo<PlayerAir, bool>(true);
+        fsm.TransitionTo<PlayerAir, bool>(false);
     }
 
     void CrouchPerformed(InputAction.CallbackContext ctx)

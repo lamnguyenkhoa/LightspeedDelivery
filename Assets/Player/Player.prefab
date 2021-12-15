@@ -4333,7 +4333,7 @@ MonoBehaviour:
   mainCamera: {fileID: 0}
   controller: {fileID: 0}
   wallRunSpeed: 14
-  gravity: 10
+  gravity: 15
   maxGravity: 5
   cameraTilt: 0
   maxCameraTilt: 0
