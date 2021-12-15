@@ -8,6 +8,7 @@ public class PlayerState : MonoBehaviour, IState
     [HideInInspector] public FiniteStateMachine fsm;
     [HideInInspector] public MainInstances mainInstances;
     [HideInInspector] public EventsManager eventsManager;
+    [HideInInspector] public PlayerStats playerStats;
     [HideInInspector] public Camera mainCamera;
     [HideInInspector] public CharacterController controller;
     [HideInInspector] public GameControls gameControls;
@@ -18,6 +19,7 @@ public class PlayerState : MonoBehaviour, IState
         
         mainInstances = player.mainInstances;
         eventsManager = player.eventsManager;
+        playerStats = player.playerStats;
         fsm = player.fsm;
 
         mainCamera = player.mainCamera;

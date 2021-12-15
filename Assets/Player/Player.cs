@@ -13,8 +13,11 @@ public class Player : MonoBehaviour
 
     public MainInstances mainInstances;
     public EventsManager eventsManager;
-    public GameControls gameControls;
+    public PlayerStats playerStats;
+    [HideInInspector] public GameControls gameControls;
     [HideInInspector] public FiniteStateMachine fsm;
+
+    [HideInInspector] public Vector3 motion;
 
     [Space, Header("Camera")]
     public float mouseSensitivity = 100f;
@@ -95,7 +98,7 @@ public class Player : MonoBehaviour
     private bool isGunCharging = false;
 
     [Space, Header("GUI")]
-    public PlayerStats playerStats;
+    // public PlayerStats playerStats;
     public TextMeshProUGUI deliveredText;
     public TextMeshProUGUI foodBagLeftText;
     public int requiredDeliveryAmount = 3; // set at start of misison

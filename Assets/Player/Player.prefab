@@ -1435,7 +1435,7 @@ Camera:
   m_Depth: 0
   m_CullingMask:
     serializedVersion: 2
-    m_Bits: 96
+    m_Bits: 8416
   m_RenderingPath: -1
   m_TargetTexture: {fileID: 0}
   m_TargetDisplay: 0
@@ -4067,7 +4067,9 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   mainInstances: {fileID: 11400000, guid: d0cc5eadc28d80f40b0e9740a22d315d, type: 2}
   eventsManager: {fileID: 11400000, guid: d531b4bcf2606fb4eacbe886cf2d937f, type: 2}
+  playerStats: {fileID: 11400000, guid: ce6d4b0911f31014c88320bde46abec1, type: 2}
   fsm: {fileID: 0}
+  motion: {x: 0, y: 0, z: 0}
   mouseSensitivity: 200
   mainCamera: {fileID: 8506846801711785073}
   xRotation: 0
@@ -4115,7 +4117,6 @@ MonoBehaviour:
   minShootForce: 5
   currentFoodBag: 3
   shootForceSlider: {fileID: 6537709386715725882}
-  playerStats: {fileID: 11400000, guid: ce6d4b0911f31014c88320bde46abec1, type: 2}
   deliveredText: {fileID: 6537709388643306134}
   foodBagLeftText: {fileID: 6537709387267488382}
   requiredDeliveryAmount: 3
@@ -4163,6 +4164,7 @@ MonoBehaviour:
   fsm: {fileID: 0}
   mainInstances: {fileID: 0}
   eventsManager: {fileID: 0}
+  playerStats: {fileID: 0}
   mainCamera: {fileID: 0}
   controller: {fileID: 0}
   runSpeed: 9
@@ -4183,6 +4185,7 @@ MonoBehaviour:
   fsm: {fileID: 0}
   mainInstances: {fileID: 0}
   eventsManager: {fileID: 0}
+  playerStats: {fileID: 0}
   mainCamera: {fileID: 0}
   controller: {fileID: 0}
   mouseSensitivity: 0.2
@@ -4213,6 +4216,7 @@ MonoBehaviour:
   fsm: {fileID: 0}
   mainInstances: {fileID: 0}
   eventsManager: {fileID: 0}
+  playerStats: {fileID: 0}
   mainCamera: {fileID: 0}
   controller: {fileID: 0}
   jumpHeight: 12
@@ -4233,6 +4237,7 @@ MonoBehaviour:
   fsm: {fileID: 0}
   mainInstances: {fileID: 0}
   eventsManager: {fileID: 0}
+  playerStats: {fileID: 0}
   mainCamera: {fileID: 0}
   controller: {fileID: 0}
   crouchSpeed: 5
@@ -4254,6 +4259,7 @@ MonoBehaviour:
   fsm: {fileID: 0}
   mainInstances: {fileID: 0}
   eventsManager: {fileID: 0}
+  playerStats: {fileID: 0}
   mainCamera: {fileID: 0}
   controller: {fileID: 0}
   sunraySpeed: 100
@@ -4279,11 +4285,12 @@ MonoBehaviour:
   fsm: {fileID: 0}
   mainInstances: {fileID: 0}
   eventsManager: {fileID: 0}
+  playerStats: {fileID: 0}
   mainCamera: {fileID: 0}
   controller: {fileID: 0}
-  slideSpeed: 16
+  slideSpeed: 18
   slideAcceleration: 45
-  slideTime: 1.5
+  slideTime: 1
   normalHeight: 2
   slideHeight: 0.7
   floorGravity: 2
@@ -4303,6 +4310,7 @@ MonoBehaviour:
   fsm: {fileID: 0}
   mainInstances: {fileID: 0}
   eventsManager: {fileID: 0}
+  playerStats: {fileID: 0}
   mainCamera: {fileID: 0}
   controller: {fileID: 0}
 --- !u!114 &1997303425841329234
@@ -4321,8 +4329,14 @@ MonoBehaviour:
   fsm: {fileID: 0}
   mainInstances: {fileID: 0}
   eventsManager: {fileID: 0}
+  playerStats: {fileID: 0}
   mainCamera: {fileID: 0}
   controller: {fileID: 0}
+  wallRunSpeed: 14
+  gravity: 10
+  maxGravity: 5
+  cameraTilt: 0
+  maxCameraTilt: 0
 --- !u!1 &8506846801027605395
 GameObject:
   m_ObjectHideFlags: 0
@@ -4628,7 +4642,7 @@ Camera:
   m_Depth: -1
   m_CullingMask:
     serializedVersion: 2
-    m_Bits: 4294967263
+    m_Bits: 4294967064
   m_RenderingPath: -1
   m_TargetTexture: {fileID: 0}
   m_TargetDisplay: 0

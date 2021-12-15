@@ -25,6 +25,8 @@ public class PlayerStats : ScriptableObject
     // }
 
     public int deliveredAmount = 0;
+    public float energy = 0;
+    public float stamina = 100;
 
     public void IncreaseDeliveredAmount()
     {

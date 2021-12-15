@@ -16,6 +16,17 @@ public class PlayerAir : PlayerState
         playerMotion = GetComponent<PlayerMotion>();
     }
 
+    public override void _FixedUpdate()
+    {
+        bool isWallRight = Physics.Raycast(transform.position, transform.right, 1f);
+        bool isWallLeft = Physics.Raycast(transform.position, -transform.right, 1f);
+
+        if (gameControls.Player.Move.ReadValue<Vector2>().x < 0 && isWallLeft)
+            fsm.TransitionTo<PlayerWallRun, bool>(false);
+        else if (gameControls.Player.Move.ReadValue<Vector2>().x > 0 && isWallRight)
+            fsm.TransitionTo<PlayerWallRun, bool>(true);
+    }
+
     public override void _Update()
     {
         playerMotion._Update();
