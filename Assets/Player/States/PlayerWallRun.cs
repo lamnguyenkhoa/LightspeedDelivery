@@ -6,6 +6,9 @@ using UnityEngine.InputSystem;
 public class PlayerWallRun : PlayerState
 {
     PlayerMotion playerMotion;
+    public float staminaCost = 75f;
+    public float recoverRate = 125f;
+    public float recoverDelay = 1.5f;
     public float wallRunSpeed = 5;
     public float gravity = 8f;
     public float maxGravity = 2f;
@@ -35,11 +38,15 @@ public class PlayerWallRun : PlayerState
         motion.y -= gravity * Time.deltaTime;
         motion.y = Mathf.Max(motion.y, -maxGravity);
 
-        if (controller.isGrounded)
-            fsm.TransitionTo<PlayerGround>();
-
         player.transform.eulerAngles = new Vector3(0, playerMotion.xRotation, 0);
         mainCamera.transform.localEulerAngles = new Vector3(playerMotion.yRotation, 0, 0);
+
+        playerStats.stamina -= staminaCost * Time.deltaTime;
+        if (playerStats.stamina <= 0)
+            fsm.TransitionTo<PlayerAir>();
+
+        if (controller.isGrounded)
+            fsm.TransitionTo<PlayerGround>();
     }
 
     public override void _Enter<Boolean>(Boolean wallRunRight)
@@ -60,12 +67,16 @@ public class PlayerWallRun : PlayerState
             motion -= player.transform.right;
             runningRight = false;
         }
+
+        CancelInvoke("RecoverStamina");
     }
 
     public override void _Exit()
     {
         playerMotion._Exit();
         gameControls.Player.Jump.performed -= JumpPerformed;
+
+        Invoke("RecoverStamina", recoverDelay);
     }
 
     public void JumpPerformed(InputAction.CallbackContext ctx)
@@ -76,5 +87,19 @@ public class PlayerWallRun : PlayerState
             playerMotion.motion.x = wallRunSpeed;
         
         fsm.TransitionTo<PlayerAir, bool>(true);
+    }
+
+    bool recoverStamina = false;
+
+    void Update()
+    {
+        if (!recoverStamina) return;
+        playerStats.stamina += recoverRate * Time.deltaTime;
+        if (playerStats.stamina >= playerStats.maxStamina) recoverStamina = false;
+    }
+
+    void RecoverStamina()
+    {
+        recoverStamina = true;
     }
 }

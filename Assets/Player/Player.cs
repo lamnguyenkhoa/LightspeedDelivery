@@ -156,7 +156,7 @@ public class Player : MonoBehaviour
 
     private void Start()
     {
-        Cursor.lockState = CursorLockMode.Locked;
+        // Cursor.lockState = CursorLockMode.Locked;
         velocity = Vector3.zero;
         startFOV = mainCamera.fieldOfView;
         currentPower = 0f;
@@ -164,6 +164,11 @@ public class Player : MonoBehaviour
         currentFoodBag = requiredDeliveryAmount;
         currentStamina = maxStamina;
         isCrouching = false;
+    }
+
+    private void Update() 
+    {
+        if (playerStats.restorePower) playerStats.power += playerStats.powerRecoverRate * Time.deltaTime;
     }
 
     // private void Update()

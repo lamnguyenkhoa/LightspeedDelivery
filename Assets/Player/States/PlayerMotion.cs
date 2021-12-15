@@ -5,6 +5,7 @@ using UnityEngine.InputSystem;
 
 public class PlayerMotion : PlayerState
 {
+    public PlayerDash playerDash;
     public float mouseSensitivity = 0.5f;
     public float acceleration = 15f;
     public float decceleration = 20f;
@@ -18,6 +19,11 @@ public class PlayerMotion : PlayerState
     [HideInInspector] public float yRotation = 0;
     [HideInInspector] public Vector3 motion = Vector3.zero;
     [HideInInspector] public Vector3 finalMove = Vector3.zero;
+
+    private void Awake() 
+    {
+        playerDash = GetComponent<PlayerDash>();
+    }
 
     public override void _Update() 
     {
@@ -76,6 +82,8 @@ public class PlayerMotion : PlayerState
 
     void SetDash(InputAction.CallbackContext ctx)
     {
+        if (playerStats.power < playerDash.dashCost) return;
+        
         moveDirection = Vector2.zero;
         motion = Vector3.zero;
         

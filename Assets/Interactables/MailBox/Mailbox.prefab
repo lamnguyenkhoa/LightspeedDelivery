@@ -171,9 +171,9 @@ MonoBehaviour:
           m_StringArgument: 
           m_BoolArgument: 0
         m_CallState: 2
-      - m_Target: {fileID: 0}
-        m_TargetAssemblyTypeName: Door, Assembly-CSharp
-        m_MethodName: IncreaseFoodCount
+      - m_Target: {fileID: 11400000, guid: d531b4bcf2606fb4eacbe886cf2d937f, type: 2}
+        m_TargetAssemblyTypeName: EventsManager, Assembly-CSharp
+        m_MethodName: FoodDelivered
         m_Mode: 1
         m_Arguments:
           m_ObjectArgument: {fileID: 0}

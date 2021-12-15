@@ -50,7 +50,7 @@ public class PlayerAir : PlayerState
         playerMotion._Enter();
         gameControls.Player.Jump.performed += JumpPerformed;
         coyoteTimeCount = 0;
-        checkWall = false;
+        checkWall = true;
     }
 
     public override void _Enter<Boolean>(Boolean fromWall)

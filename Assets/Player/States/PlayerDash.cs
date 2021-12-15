@@ -5,6 +5,7 @@ using UnityEngine;
 public class PlayerDash : PlayerState
 {
     PlayerMotion playerMotion;
+    public float dashCost = 50f;
     public float sunraySpeed = 50f;
     public float sunrayTime = 1.0f;
     public float detectionDistance = 1.5f;
@@ -51,8 +52,10 @@ public class PlayerDash : PlayerState
     public override void _Enter()
     {
         eventsManager.PlayerDashStarted();
+        
         dashDirection = mainCamera.transform.forward;
 
+        playerStats.power -= dashCost;
         Invoke("DashEnded", sunrayTime);
     }
 
