@@ -42,7 +42,7 @@ public class Mailbox : MonoBehaviour
     {
         if (delivered) return;
 
-        if (other.GetComponent<FoodBagScript>())
+        if (other.GetComponent<FoodBag>())
         {
             delivered = true;
             FoodDelivered();

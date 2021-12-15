@@ -6,4 +6,5 @@ using UnityEngine;
 public class MainInstances : ScriptableObject
 {
     [HideInInspector] public Player player;
+    [HideInInspector] public Camera mainCamera;
 }

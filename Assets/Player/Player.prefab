@@ -776,6 +776,56 @@ Transform:
   m_Father: {fileID: 9150463370553847103}
   m_RootOrder: 0
   m_LocalEulerAnglesHint: {x: 48.226917, y: -17.445724, z: -25.598665}
+--- !u!1 &2808008309076401167
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 4877555620374325813}
+  - component: {fileID: 144936196661348274}
+  m_Layer: 0
+  m_Name: FoodGun
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!4 &4877555620374325813
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 2808008309076401167}
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalPosition: {x: 0, y: 0, z: 0}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_Children: []
+  m_Father: {fileID: 8506846800919694614}
+  m_RootOrder: 4
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!114 &144936196661348274
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 2808008309076401167}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 395b7b27d44ad79499a7b75bffd3f370, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  mainInstances: {fileID: 11400000, guid: d0cc5eadc28d80f40b0e9740a22d315d, type: 2}
+  playerStats: {fileID: 11400000, guid: ce6d4b0911f31014c88320bde46abec1, type: 2}
+  foodGun: {fileID: 220341134078845575}
+  foodBag: {fileID: -777462847737924251, guid: 5079c73c2f7f6654e9d80526ae44461c, type: 3}
+  maxShootForce: 30
+  minShootForce: 5
+  forceRate: 20
 --- !u!1 &2826363736551817444
 GameObject:
   m_ObjectHideFlags: 0
@@ -2322,6 +2372,7 @@ Transform:
   - {fileID: 8506846801447266050}
   - {fileID: 8506846801215529179}
   - {fileID: 8506846801027605397}
+  - {fileID: 4877555620374325813}
   - {fileID: 8506846801711785074}
   m_Father: {fileID: 0}
   m_RootOrder: 0
@@ -2377,6 +2428,7 @@ MonoBehaviour:
   playerStats: {fileID: 11400000, guid: ce6d4b0911f31014c88320bde46abec1, type: 2}
   fsm: {fileID: 0}
   motion: {x: 0, y: 0, z: 0}
+  foodGun: {fileID: 144936196661348274}
   mouseSensitivity: 200
   mainCamera: {fileID: 8506846801711785073}
   xRotation: 0
@@ -2417,7 +2469,6 @@ MonoBehaviour:
   sunrayModel: {fileID: 8506846801215529178}
   aimRenderer: {fileID: 8506846801027605396}
   nPlantInRange: 0
-  foodGun: {fileID: 220341134078845575}
   foodBagPrefab: {fileID: -777462847737924251, guid: 5079c73c2f7f6654e9d80526ae44461c, type: 3}
   maxShootForce: 30
   shootForceIncreaseRate: 20
@@ -2474,6 +2525,7 @@ MonoBehaviour:
   playerStats: {fileID: 0}
   mainCamera: {fileID: 0}
   controller: {fileID: 0}
+  foodGun: {fileID: 0}
   runSpeed: 9
   sprintSpeed: 14
 --- !u!114 &674770177536580126
@@ -2495,6 +2547,8 @@ MonoBehaviour:
   playerStats: {fileID: 0}
   mainCamera: {fileID: 0}
   controller: {fileID: 0}
+  foodGun: {fileID: 0}
+  playerDash: {fileID: 0}
   mouseSensitivity: 0.2
   acceleration: 30
   decceleration: 30
@@ -2526,6 +2580,7 @@ MonoBehaviour:
   playerStats: {fileID: 0}
   mainCamera: {fileID: 0}
   controller: {fileID: 0}
+  foodGun: {fileID: 0}
   jumpHeight: 12
   coyoteMaxTime: 0.2
   wallCheckTime: 0.2
@@ -2548,6 +2603,7 @@ MonoBehaviour:
   playerStats: {fileID: 0}
   mainCamera: {fileID: 0}
   controller: {fileID: 0}
+  foodGun: {fileID: 0}
   crouchSpeed: 5
   normalHeight: 2
   crouchHeight: 1
@@ -2570,6 +2626,8 @@ MonoBehaviour:
   playerStats: {fileID: 0}
   mainCamera: {fileID: 0}
   controller: {fileID: 0}
+  foodGun: {fileID: 0}
+  dashCost: 50
   sunraySpeed: 100
   sunrayTime: 0.5
   detectionDistance: 1.5
@@ -2596,12 +2654,13 @@ MonoBehaviour:
   playerStats: {fileID: 0}
   mainCamera: {fileID: 0}
   controller: {fileID: 0}
+  foodGun: {fileID: 0}
   slideSpeed: 18
   slideAcceleration: 45
   slideTime: 1
   normalHeight: 2
-  slideHeight: 0.7
-  floorGravity: 2
+  slideHeight: 0.5
+  floorGravity: 12
 --- !u!114 &4147013551866941844
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -2621,6 +2680,7 @@ MonoBehaviour:
   playerStats: {fileID: 0}
   mainCamera: {fileID: 0}
   controller: {fileID: 0}
+  foodGun: {fileID: 0}
 --- !u!114 &1997303425841329234
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -2640,6 +2700,10 @@ MonoBehaviour:
   playerStats: {fileID: 0}
   mainCamera: {fileID: 0}
   controller: {fileID: 0}
+  foodGun: {fileID: 0}
+  staminaCost: 75
+  recoverRate: 125
+  recoverDelay: 1.5
   wallRunSpeed: 14
   gravity: 15
   maxGravity: 5
@@ -2917,7 +2981,7 @@ Transform:
   m_Children:
   - {fileID: 4345384784914727933}
   m_Father: {fileID: 8506846800919694614}
-  m_RootOrder: 4
+  m_RootOrder: 5
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!20 &8506846801711785073
 Camera:

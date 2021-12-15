@@ -14,6 +14,7 @@ public class InGame : MonoBehaviour
     public TextMeshProUGUI foodBagLeftText;
     public Slider staminaSlider;
     public Slider powerSlider;
+    public Slider shootForceSlider;
 
     public GameObject pauseMenu;
     bool isPaused = false;
@@ -23,11 +24,20 @@ public class InGame : MonoBehaviour
     {
         staminaSlider.maxValue = playerStats.maxStamina;
         powerSlider.maxValue = playerStats.maxPower;
+
         gameControls = new GameControls();
     }
 
     private void Start() 
     {
+        SetStamina(playerStats.stamina);
+        SetPower(playerStats.power);
+
+        SetDeliveredText();
+        SetFoodbagText(playerStats.foodbags);
+
+        SetShootForce(0);
+        
         Unpause();
     }
 
@@ -42,6 +52,8 @@ public class InGame : MonoBehaviour
 
         eventsManager.OnFoodDelivered += SetDeliveredText;
         eventsManager.OnOrderReceived += SetDeliveredText;
+
+        playerStats.OnShootForceChanged += SetShootForce;
     }
 
     private void OnDisable() 
@@ -55,6 +67,8 @@ public class InGame : MonoBehaviour
 
         eventsManager.OnFoodDelivered -= SetDeliveredText;
         eventsManager.OnOrderReceived -= SetDeliveredText;
+
+        playerStats.OnShootForceChanged -= SetShootForce;
     }
 
     void SetDeliveredText()
@@ -75,6 +89,11 @@ public class InGame : MonoBehaviour
     void SetPower(float amount)
     {
         powerSlider.value = amount;
+    }
+
+    void SetShootForce(float amount)
+    {
+        shootForceSlider.value = amount / playerStats.maxShootForce;
     }
 
     void PausePerformed(InputAction.CallbackContext ctx)

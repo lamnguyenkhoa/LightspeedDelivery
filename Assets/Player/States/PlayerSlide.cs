@@ -37,6 +37,7 @@ public class PlayerSlide : PlayerState
     public override void _Enter()
     {
         gameControls.Player.Jump.performed += JumpPerformed;
+        gameControls.Player.Crouch.canceled += CancelSlide;
 
         controller.height = slideHeight;
         motion = playerMotion.finalMove;
@@ -48,6 +49,7 @@ public class PlayerSlide : PlayerState
     public override void _Exit()
     {
         gameControls.Player.Jump.performed -= JumpPerformed;
+        gameControls.Player.Crouch.canceled -= CancelSlide;
 
         controller.height = normalHeight;
 
@@ -57,6 +59,11 @@ public class PlayerSlide : PlayerState
     void JumpPerformed(InputAction.CallbackContext ctx)
     {
         fsm.TransitionTo<PlayerAir, bool>(true);
+    }
+
+    void CancelSlide(InputAction.CallbackContext ctx)
+    {
+        SlideEnded();
     }
 
     void SlideEnded()

@@ -115,6 +115,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   mainInstances: {fileID: 11400000, guid: d0cc5eadc28d80f40b0e9740a22d315d, type: 2}
+  playerStats: {fileID: 11400000, guid: ce6d4b0911f31014c88320bde46abec1, type: 2}
   shootDirection: {x: 0, y: 0, z: 0}
   shootForce: 0
   bonusFromPlayerMomentum: {x: 0, y: 0, z: 0}

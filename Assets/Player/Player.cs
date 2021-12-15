@@ -11,6 +11,7 @@ public class Player : MonoBehaviour
 {
     #region Variables
 
+    // Variables shared with Finite State Machine
     public MainInstances mainInstances;
     public EventsManager eventsManager;
     public PlayerStats playerStats;
@@ -18,6 +19,8 @@ public class Player : MonoBehaviour
     [HideInInspector] public FiniteStateMachine fsm;
 
     [HideInInspector] public Vector3 motion;
+    public FoodGun foodGun;
+    // End of veriables shared with Finite State Machine
 
     [Space, Header("Camera")]
     public float mouseSensitivity = 100f;
@@ -87,8 +90,8 @@ public class Player : MonoBehaviour
     [HideInInspector] public int nPlantInRange = 0;
 
     [Space, Header("Food gun")]
-    public GameObject foodGun;
-    public FoodBagScript foodBagPrefab;
+    // public GameObject foodGun;
+    public FoodBag foodBagPrefab;
     private float currentShootForce = 0f;
     public float maxShootForce = 60f;
     public float shootForceIncreaseRate = 20f;
@@ -148,6 +151,7 @@ public class Player : MonoBehaviour
     {
         playerStats.ResetStats();
         mainInstances.player = this;
+        mainInstances.mainCamera = mainCamera;
         fsm = GetComponent<FiniteStateMachine>();
 
         controller = GetComponent<CharacterController>();
@@ -496,7 +500,7 @@ public class Player : MonoBehaviour
             if (currentShootForce >= minShootForce && currentFoodBag >= 1)
             {
                 AudioManager.instance.PlayFoodSplat();
-                FoodBagScript newFoodBag = Instantiate(foodBagPrefab, foodGun.transform.position, Quaternion.Euler(new Vector3(-90, 0, 0)));
+                FoodBag newFoodBag = Instantiate(foodBagPrefab, foodGun.transform.position, Quaternion.Euler(new Vector3(-90, 0, 0)));
                 newFoodBag.shootDirection = mainCamera.transform.forward;
                 newFoodBag.shootForce = currentShootForce;
                 // not all momentum yet, only player "active" momentum

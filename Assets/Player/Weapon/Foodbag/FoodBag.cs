@@ -2,9 +2,10 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
-public class FoodBagScript : MonoBehaviour
+public class FoodBag : MonoBehaviour
 {
     public MainInstances mainInstances;
+    public PlayerStats playerStats;
     [HideInInspector]
     public Vector3 shootDirection;
 
@@ -34,7 +35,7 @@ public class FoodBagScript : MonoBehaviour
         timer += Time.deltaTime;
         if (timer > returnTime)
         {
-            mainInstances.player.currentFoodBag += 1;
+            playerStats.foodbags += 1;
             Destroy(this.gameObject);
         }
     }
@@ -45,7 +46,7 @@ public class FoodBagScript : MonoBehaviour
         Player player = other.transform.GetComponent<Player>();
         if (player && timer > timeBeforeAllowedRepickup)
         {
-            player.currentFoodBag += 1;
+            playerStats.foodbags += 1;
             Destroy(this.gameObject);
         }
     }

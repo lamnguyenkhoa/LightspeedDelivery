@@ -12,6 +12,7 @@ public class PlayerState : MonoBehaviour, IState
     [HideInInspector] public Camera mainCamera;
     [HideInInspector] public CharacterController controller;
     [HideInInspector] public GameControls gameControls;
+    [HideInInspector] public FoodGun foodGun;
 
     private void Start() 
     {
@@ -25,6 +26,8 @@ public class PlayerState : MonoBehaviour, IState
         mainCamera = player.mainCamera;
         controller = player.controller;
         gameControls = player.gameControls;
+
+        foodGun = player.foodGun;
     }
     
     public virtual void _Enter()

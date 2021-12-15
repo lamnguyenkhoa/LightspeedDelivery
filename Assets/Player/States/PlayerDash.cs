@@ -57,6 +57,8 @@ public class PlayerDash : PlayerState
 
         playerStats.power -= dashCost;
         Invoke("DashEnded", sunrayTime);
+        
+        foodGun.DeactivateGun();
     }
 
     public override void _Exit()
@@ -64,6 +66,8 @@ public class PlayerDash : PlayerState
         eventsManager.PlayerDashEnded();
         
         CancelInvoke("DashEnded");
+
+        foodGun.ActivateGun();
     }
 
     void DashEnded()

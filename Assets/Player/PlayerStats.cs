@@ -44,6 +44,27 @@ public class PlayerStats : ScriptableObject
     //     if (OnDeliveredAmountChanged != null) OnDeliveredAmountChanged(amount);
     // }
 
+    public float maxShootForce = 30;
+    float _shootForce = 0;
+    public float shootForce
+    {
+        get
+        {
+            return _shootForce;
+        }
+        set
+        {
+            _shootForce = Mathf.Clamp(value, 0, maxShootForce);
+            ShootForceChanged(_shootForce);
+        }
+    }
+
+    public event Action<float> OnShootForceChanged;
+    public void ShootForceChanged(float amount)
+    {
+        if (OnShootForceChanged != null) OnShootForceChanged(amount);
+    }
+
     int _foodbags = 0;
     public int foodbags
     {

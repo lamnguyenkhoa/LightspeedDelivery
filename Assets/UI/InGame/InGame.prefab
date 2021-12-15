@@ -1077,6 +1077,7 @@ MonoBehaviour:
   foodBagLeftText: {fileID: 7755750575230602174}
   staminaSlider: {fileID: 7755750575393900215}
   powerSlider: {fileID: 7755750573796792926}
+  shootForceSlider: {fileID: 7755750574844015098}
   pauseMenu: {fileID: 3538538491491391458}
 --- !u!1 &7755750574707021449
 GameObject:
