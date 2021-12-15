@@ -13,6 +13,8 @@ public class Player : MonoBehaviour
 
     public MainInstances mainInstances;
     public EventsManager eventsManager;
+    public GameControls gameControls;
+    [HideInInspector] public FiniteStateMachine fsm;
 
     [Space, Header("Camera")]
     public float mouseSensitivity = 100f;
@@ -38,7 +40,7 @@ public class Player : MonoBehaviour
     private bool isRunning;
     public Vector3 velocity; // environmental stuff affect player movement
     private Vector3 dashDirection;
-    private CharacterController controller;
+    [HideInInspector] public CharacterController controller;
     private bool reliableIsGrouned; // because controller.isGrounded is damn unreliable
     private float coyoteTime = 0.2f;
     public float airTimer = 0f;
@@ -129,15 +131,28 @@ public class Player : MonoBehaviour
 
     #region UnityCallbacks
 
+    private void OnEnable() 
+    {
+        gameControls.Enable();
+    }
+
+    private void OnDisable() 
+    {
+        gameControls.Disable();
+    }
+
     private void Awake()
     {
         playerStats.ResetStats();
         mainInstances.player = this;
+        fsm = GetComponent<FiniteStateMachine>();
+
+        controller = GetComponent<CharacterController>();
+        gameControls = new GameControls();
     }
 
     private void Start()
     {
-        controller = GetComponent<CharacterController>();
         Cursor.lockState = CursorLockMode.Locked;
         velocity = Vector3.zero;
         startFOV = mainCamera.fieldOfView;
@@ -148,73 +163,73 @@ public class Player : MonoBehaviour
         isCrouching = false;
     }
 
-    private void Update()
-    {
-        HandlePause();
+    // private void Update()
+    // {
+    //     HandlePause();
 
-        if (inSunrayForm)
-        {
-            mainCamera.fieldOfView = Mathf.Lerp(mainCamera.fieldOfView, maxFOV, 0.05f);
+    //     if (inSunrayForm)
+    //     {
+    //         mainCamera.fieldOfView = Mathf.Lerp(mainCamera.fieldOfView, maxFOV, 0.05f);
 
-            mainCamera.transform.forward = Vector3.Lerp(mainCamera.transform.forward, dashDirection, 0.05f);
+    //         mainCamera.transform.forward = Vector3.Lerp(mainCamera.transform.forward, dashDirection, 0.05f);
 
-            Vector3 dashEulerRotation = Quaternion.LookRotation(dashDirection).eulerAngles;
-            // Update xRotation so when player go back to Human Form it doesn't reset the camera
-            // rotation
-            xRotation = dashEulerRotation.x;
-            if (xRotation > 90)
-            {
-                xRotation = xRotation - 360f;
-            }
+    //         Vector3 dashEulerRotation = Quaternion.LookRotation(dashDirection).eulerAngles;
+    //         // Update xRotation so when player go back to Human Form it doesn't reset the camera
+    //         // rotation
+    //         xRotation = dashEulerRotation.x;
+    //         if (xRotation > 90)
+    //         {
+    //             xRotation = xRotation - 360f;
+    //         }
 
-            // Smooth rotate these 2 value so player dont feel nauseous
-            Quaternion bodyRotation = Quaternion.Euler(new Vector3(0, dashEulerRotation.y, 0));
-            Quaternion cameraRotation = Quaternion.Euler(new Vector3(xRotation, 0, 0));
+    //         // Smooth rotate these 2 value so player dont feel nauseous
+    //         Quaternion bodyRotation = Quaternion.Euler(new Vector3(0, dashEulerRotation.y, 0));
+    //         Quaternion cameraRotation = Quaternion.Euler(new Vector3(xRotation, 0, 0));
 
-            transform.rotation = Quaternion.Lerp(transform.rotation, bodyRotation, 0.1f);
-            mainCamera.transform.localRotation = Quaternion.Lerp(mainCamera.transform.localRotation, cameraRotation, 0.1f);
+    //         transform.rotation = Quaternion.Lerp(transform.rotation, bodyRotation, 0.1f);
+    //         mainCamera.transform.localRotation = Quaternion.Lerp(mainCamera.transform.localRotation, cameraRotation, 0.1f);
 
-            SunrayDash();
+    //         SunrayDash();
 
-            if (Time.time > timer + timeInSunrayForm)
-            {
-                HumanForm();
-            }
-        }
-        else
-        {
-            HandleCamera();
+    //         if (Time.time > timer + timeInSunrayForm)
+    //         {
+    //             HumanForm();
+    //         }
+    //     }
+    //     else
+    //     {
+    //         HandleCamera();
 
-            HandleSlope();
+    //         HandleSlope();
 
-            HandleAnimationSyncedHeadBob();
+    //         HandleAnimationSyncedHeadBob();
 
-            HandleMovement();
+    //         HandleMovement();
 
-            HandleAnimation();
+    //         HandleAnimation();
 
-            HandleCrouch();
+    //         HandleCrouch();
 
-            if (enableWallRun)
-                HandleWallRun();
+    //         if (enableWallRun)
+    //             HandleWallRun();
 
-            HandleGravity();
+    //         HandleGravity();
 
-            //HandleLanding();
+    //         //HandleLanding();
 
-            //HandleHeadBob();
+    //         //HandleHeadBob();
 
-            HandleSpecialAbilities();
+    //         HandleSpecialAbilities();
 
-            HandleShootGun();
+    //         HandleShootGun();
 
-            HandleAnimation();
+    //         HandleAnimation();
 
-            UpdateGUI();
+    //         UpdateGUI();
 
-            HandleRecovery();
-        }
-    }
+    //         HandleRecovery();
+    //     }
+    // }
 
     #endregion UnityCallbacks
 
@@ -523,7 +538,7 @@ public class Player : MonoBehaviour
         }
     }
 
-    private void HandleCamera()
+    public void HandleCamera()
     {
         mainCamera.fieldOfView = Mathf.Lerp(mainCamera.fieldOfView, startFOV, 0.05f);
 
@@ -537,7 +552,7 @@ public class Player : MonoBehaviour
         transform.Rotate(Vector3.up * mouseX * Time.deltaTime);
     }
 
-    private void HandleGravity()
+    public void HandleGravity()
     {
         // Gravity
         // For some reason, the built-in controller.isGrounded only work if
@@ -585,7 +600,7 @@ public class Player : MonoBehaviour
             currentStamina += staminaRecovery * Time.deltaTime;
     }
 
-    private void HandleMovement()
+    public void HandleMovement()
     {
         float bonusJumpForce;
 
