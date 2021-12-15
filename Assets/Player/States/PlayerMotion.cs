@@ -58,6 +58,8 @@ public class PlayerMotion : PlayerState
 
         player.transform.eulerAngles = new Vector3(0, xRotation, 0);
         mainCamera.transform.localEulerAngles = new Vector3(yRotation, 0, 0);
+
+        anim.SetFloat("HeadLook", (yRotation + 90f) / 180f, 1f, Time.deltaTime * 10f);
     }
 
     public override void _Enter()

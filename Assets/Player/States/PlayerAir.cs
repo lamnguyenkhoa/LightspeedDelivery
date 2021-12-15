@@ -51,6 +51,8 @@ public class PlayerAir : PlayerState
         gameControls.Player.Jump.performed += JumpPerformed;
         coyoteTimeCount = 0;
         checkWall = true;
+        
+        anim.SetBool("isFalling", true);
     }
 
     public override void _Enter<Boolean>(Boolean fromWall)
@@ -69,6 +71,8 @@ public class PlayerAir : PlayerState
         }
         else
             checkWall = true;
+
+        anim.SetTrigger("jump");
     }
 
     public override void _Exit()

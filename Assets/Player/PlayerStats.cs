@@ -5,44 +5,7 @@ using UnityEngine;
 public class PlayerStats : ScriptableObject
 {
     public int orders = 3;
-    // public int orders 
-    // {
-    //     get
-    //     {
-    //         return _orders;
-    //     }
-    //     set
-    //     {
-    //         _orders = value;
-    //         OrdersChanged(_orders);
-    //     }
-    // }
-
-    // public event Action<int> OnOrdersChanged;
-    // public void OrdersChanged(int amount)
-    // {
-    //     if (OnOrdersChanged != null) OnOrdersChanged(amount);
-    // }
-
     public int deliveredAmount = 0;
-    // public int deliveredAmount
-    // {
-    //     get
-    //     {
-    //         return _deliveredAmount;
-    //     }
-    //     set
-    //     {
-    //         _deliveredAmount = Mathf.Clamp(value, 0, _orders);
-    //         DeliveredAmountChanged(_deliveredAmount);
-    //     }
-    // }
-
-    // public event Action<int> OnDeliveredAmountChanged;
-    // public void DeliveredAmountChanged(int amount)
-    // {
-    //     if (OnDeliveredAmountChanged != null) OnDeliveredAmountChanged(amount);
-    // }
 
     public float maxShootForce = 30;
     float _shootForce = 0;

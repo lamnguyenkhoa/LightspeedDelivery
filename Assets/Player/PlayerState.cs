@@ -13,6 +13,7 @@ public class PlayerState : MonoBehaviour, IState
     [HideInInspector] public CharacterController controller;
     [HideInInspector] public GameControls gameControls;
     [HideInInspector] public FoodGun foodGun;
+    [HideInInspector] public Animator anim;
 
     private void Start() 
     {
@@ -28,6 +29,7 @@ public class PlayerState : MonoBehaviour, IState
         gameControls = player.gameControls;
 
         foodGun = player.foodGun;
+        anim = player.anim;
     }
     
     public virtual void _Enter()

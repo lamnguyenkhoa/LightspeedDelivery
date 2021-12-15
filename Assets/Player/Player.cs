@@ -20,6 +20,7 @@ public class Player : MonoBehaviour
 
     [HideInInspector] public Vector3 motion;
     public FoodGun foodGun;
+    public Animator anim;
     // End of veriables shared with Finite State Machine
 
     [Space, Header("Camera")]
@@ -125,7 +126,6 @@ public class Player : MonoBehaviour
     private float wallJumpDirection; // which side the player will jump toward, either -1 or 1
 
     [Space, Header("Animation")]
-    public Animator anim;
     public bool justJump;
     public bool isFalling;
 

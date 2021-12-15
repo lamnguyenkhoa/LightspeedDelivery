@@ -20,6 +20,9 @@ public class PlayerGround : PlayerState
     public override void _Update() 
     {
         playerMotion._Update();
+
+        anim.SetFloat("WalkForward", playerMotion.moveDirection.y, 1f, Time.deltaTime * 3f);
+        anim.SetFloat("WalkRight", playerMotion.moveDirection.x, 1f, Time.deltaTime * 3f);
         
         if (!controller.isGrounded)
         {
@@ -42,6 +45,9 @@ public class PlayerGround : PlayerState
             SetSprint();
         else
             CancelSprint();
+
+        anim.ResetTrigger("jump");
+        anim.SetBool("isFalling", false);
     }
 
     public override void _Exit()
