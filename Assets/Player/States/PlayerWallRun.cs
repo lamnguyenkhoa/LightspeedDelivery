@@ -38,8 +38,7 @@ public class PlayerWallRun : PlayerState
     {
         controller.Move(motion * Time.deltaTime);
 
-        motion.y -= gravity * Time.deltaTime;
-        motion.y = Mathf.Max(motion.y, -maxGravity);
+        motion.y = 0f;
 
         player.transform.eulerAngles = new Vector3(0, playerMotion.xRotation, 0);
 
