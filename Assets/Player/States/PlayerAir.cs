@@ -50,8 +50,7 @@ public class PlayerAir : PlayerState
         playerMotion._Enter();
         gameControls.Player.Jump.performed += JumpPerformed;
         coyoteTimeCount = 0;
-        checkWall = true;
-        
+        checkWall = false;
         anim.SetBool("isFalling", true);
     }
 
@@ -85,7 +84,7 @@ public class PlayerAir : PlayerState
     public void JumpPerformed(InputAction.CallbackContext ctx)
     {
         if (coyoteTimeCount < coyoteMaxTime)
-            fsm.TransitionTo<PlayerAir, bool>(true);
+            fsm.TransitionTo<PlayerAir, bool>(false);
     }
 
     void SetCheckWall()

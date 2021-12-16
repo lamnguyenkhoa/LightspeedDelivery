@@ -819,11 +819,11 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 395b7b27d44ad79499a7b75bffd3f370, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  eventsManager: {fileID: 11400000, guid: d531b4bcf2606fb4eacbe886cf2d937f, type: 2}
   mainInstances: {fileID: 11400000, guid: d0cc5eadc28d80f40b0e9740a22d315d, type: 2}
   playerStats: {fileID: 11400000, guid: ce6d4b0911f31014c88320bde46abec1, type: 2}
   foodGun: {fileID: 220341134078845575}
   foodBag: {fileID: -777462847737924251, guid: 5079c73c2f7f6654e9d80526ae44461c, type: 3}
-  maxShootForce: 30
   minShootForce: 5
   forceRate: 20
 --- !u!1 &2826363736551817444
@@ -2426,73 +2426,13 @@ MonoBehaviour:
   mainInstances: {fileID: 11400000, guid: d0cc5eadc28d80f40b0e9740a22d315d, type: 2}
   eventsManager: {fileID: 11400000, guid: d531b4bcf2606fb4eacbe886cf2d937f, type: 2}
   playerStats: {fileID: 11400000, guid: ce6d4b0911f31014c88320bde46abec1, type: 2}
+  controller: {fileID: 0}
   fsm: {fileID: 0}
   motion: {x: 0, y: 0, z: 0}
   foodGun: {fileID: 144936196661348274}
-  mouseSensitivity: 200
-  mainCamera: {fileID: 8506846801711785073}
-  xRotation: 0
-  headPos: {fileID: 8506846800884796194}
-  moveSpeed: 9
-  sprintSpeed: 14
-  crouchSpeed: 4
-  currentSpeed: 0
-  smoothSpeed: 0
-  jumpHeight: 2.5
-  gravity: -30
-  glassMask:
-    serializedVersion: 2
-    m_Bits: 1024
-  velocity: {x: 0, y: 0, z: 0}
-  controller: {fileID: 0}
-  airTimer: 0
-  isCrouching: 0
-  isSliding: 0
-  isSlopeSliding: 0
-  slideMaxTime: 2
-  slopeAngle: 0
-  slopeCanLongSlide: 0
-  slopeVerySteep: 0
-  minAngleToLongSlide: 15
-  forceSlideLimit: 45
-  steepLimit: 60
-  rayDetectionDistance: 1.5
-  sunraySpeed: 50
-  maxPower: 100
-  powerSlider: {fileID: 0}
-  dashCost: 50
-  powerRecovery: 100
-  timeInSunrayForm: 0.5
-  resetCameraAfterDash: 0
-  maxFOV: 90
-  characterModel: {fileID: 8506846802434424828}
-  sunrayModel: {fileID: 8506846801215529178}
-  aimRenderer: {fileID: 8506846801027605396}
-  nPlantInRange: 0
-  foodBagPrefab: {fileID: -777462847737924251, guid: 5079c73c2f7f6654e9d80526ae44461c, type: 3}
-  maxShootForce: 30
-  shootForceIncreaseRate: 20
-  minShootForce: 5
-  currentFoodBag: 3
-  shootForceSlider: {fileID: 0}
-  deliveredText: {fileID: 0}
-  foodBagLeftText: {fileID: 0}
-  requiredDeliveryAmount: 3
-  enableWallRun: 1
-  maxStamina: 100
-  staminaSlider: {fileID: 0}
-  staminaRecovery: 50
-  staminaRecoveryDelay: 1.5
-  wallRunCost: 75
-  isWallRunning: 0
-  wallRunCameraTilt: 0
-  maxWallRunCameraTilt: 15
-  wallJumpLockControlTime: 0.5
   anim: {fileID: 1008847042714062938}
-  justJump: 0
-  isFalling: 0
-  isPaused: 0
-  pauseMenu: {fileID: 0}
+  mainCamera: {fileID: 8506846801711785073}
+  headPos: {fileID: 8506846800884796194}
 --- !u!114 &5076031301704977604
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -2524,8 +2464,10 @@ MonoBehaviour:
   eventsManager: {fileID: 0}
   playerStats: {fileID: 0}
   mainCamera: {fileID: 0}
+  headPos: {fileID: 0}
   controller: {fileID: 0}
   foodGun: {fileID: 0}
+  anim: {fileID: 0}
   runSpeed: 9
   sprintSpeed: 14
 --- !u!114 &674770177536580126
@@ -2546,8 +2488,11 @@ MonoBehaviour:
   eventsManager: {fileID: 0}
   playerStats: {fileID: 0}
   mainCamera: {fileID: 0}
+  headPos: {fileID: 0}
   controller: {fileID: 0}
   foodGun: {fileID: 0}
+  anim: {fileID: 0}
+  cameraBobSmoothness: 20
   playerDash: {fileID: 0}
   mouseSensitivity: 0.2
   acceleration: 30
@@ -2579,11 +2524,13 @@ MonoBehaviour:
   eventsManager: {fileID: 0}
   playerStats: {fileID: 0}
   mainCamera: {fileID: 0}
+  headPos: {fileID: 0}
   controller: {fileID: 0}
   foodGun: {fileID: 0}
+  anim: {fileID: 0}
   jumpHeight: 12
   coyoteMaxTime: 0.2
-  wallCheckTime: 0.2
+  wallCheckTime: 1
 --- !u!114 &3125392923699713675
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -2602,8 +2549,10 @@ MonoBehaviour:
   eventsManager: {fileID: 0}
   playerStats: {fileID: 0}
   mainCamera: {fileID: 0}
+  headPos: {fileID: 0}
   controller: {fileID: 0}
   foodGun: {fileID: 0}
+  anim: {fileID: 0}
   crouchSpeed: 5
   normalHeight: 2
   crouchHeight: 1
@@ -2625,8 +2574,10 @@ MonoBehaviour:
   eventsManager: {fileID: 0}
   playerStats: {fileID: 0}
   mainCamera: {fileID: 0}
+  headPos: {fileID: 0}
   controller: {fileID: 0}
   foodGun: {fileID: 0}
+  anim: {fileID: 0}
   dashCost: 50
   sunraySpeed: 100
   sunrayTime: 0.5
@@ -2653,8 +2604,10 @@ MonoBehaviour:
   eventsManager: {fileID: 0}
   playerStats: {fileID: 0}
   mainCamera: {fileID: 0}
+  headPos: {fileID: 0}
   controller: {fileID: 0}
   foodGun: {fileID: 0}
+  anim: {fileID: 0}
   slideSpeed: 18
   slideAcceleration: 45
   slideTime: 1
@@ -2679,8 +2632,10 @@ MonoBehaviour:
   eventsManager: {fileID: 0}
   playerStats: {fileID: 0}
   mainCamera: {fileID: 0}
+  headPos: {fileID: 0}
   controller: {fileID: 0}
   foodGun: {fileID: 0}
+  anim: {fileID: 0}
 --- !u!114 &1997303425841329234
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -2699,16 +2654,18 @@ MonoBehaviour:
   eventsManager: {fileID: 0}
   playerStats: {fileID: 0}
   mainCamera: {fileID: 0}
+  headPos: {fileID: 0}
   controller: {fileID: 0}
   foodGun: {fileID: 0}
+  anim: {fileID: 0}
   staminaCost: 75
-  recoverRate: 125
-  recoverDelay: 1.5
+  recoverRate: 50
+  recoverDelay: 2
   wallRunSpeed: 14
-  gravity: 15
+  gravity: 40
   maxGravity: 5
-  cameraTilt: 0
-  maxCameraTilt: 0
+  tiltSmoothness: 30
+  maxCameraTilt: 20
 --- !u!1 &8506846801027605395
 GameObject:
   m_ObjectHideFlags: 0

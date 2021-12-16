@@ -114,6 +114,7 @@ public class InGame : MonoBehaviour
         pauseMenu.SetActive(true);
         Time.timeScale = 0f;
         Cursor.lockState = CursorLockMode.None;
+        eventsManager.GamePaused();
     }
 
     public void Unpause()
@@ -122,6 +123,7 @@ public class InGame : MonoBehaviour
         pauseMenu.SetActive(false);
         Time.timeScale = 1f;
         Cursor.lockState = CursorLockMode.Locked;
+        eventsManager.GameUnpaused();
     }
 
     public void GoBackToMainMenu()

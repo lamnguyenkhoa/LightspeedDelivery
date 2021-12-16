@@ -5,6 +5,7 @@ using UnityEngine.InputSystem;
 
 public class PlayerMotion : PlayerState
 {
+    public float cameraBobSmoothness = 20.0f;
     public PlayerDash playerDash;
     public float mouseSensitivity = 0.5f;
     public float acceleration = 15f;
@@ -57,7 +58,9 @@ public class PlayerMotion : PlayerState
         motion.y = Mathf.Max(motion.y, -maxGravity);
 
         player.transform.eulerAngles = new Vector3(0, xRotation, 0);
-        mainCamera.transform.localEulerAngles = new Vector3(yRotation, 0, 0);
+        mainCamera.transform.localEulerAngles = new Vector3(yRotation, 0, mainCamera.transform.localEulerAngles.z);
+
+        mainCamera.transform.position = Vector3.Lerp(mainCamera.transform.position, headPos.transform.position, cameraBobSmoothness * Time.deltaTime);
 
         anim.SetFloat("HeadLook", (yRotation + 90f) / 180f, 1f, Time.deltaTime * 10f);
     }

@@ -10,6 +10,7 @@ public class PlayerState : MonoBehaviour, IState
     [HideInInspector] public EventsManager eventsManager;
     [HideInInspector] public PlayerStats playerStats;
     [HideInInspector] public Camera mainCamera;
+    [HideInInspector] public Transform headPos;
     [HideInInspector] public CharacterController controller;
     [HideInInspector] public GameControls gameControls;
     [HideInInspector] public FoodGun foodGun;
@@ -25,6 +26,7 @@ public class PlayerState : MonoBehaviour, IState
         fsm = player.fsm;
 
         mainCamera = player.mainCamera;
+        headPos = player.headPos;
         controller = player.controller;
         gameControls = player.gameControls;
 

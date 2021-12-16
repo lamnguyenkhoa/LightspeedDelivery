@@ -33,4 +33,15 @@ public class EventsManager : ScriptableObject
     {
         if (OnPlayerDied != null) OnPlayerDied();
     }
+
+    public event Action OnGamePaused;
+    public void GamePaused()
+    {
+        if (OnGamePaused != null) OnGamePaused();
+    }
+    public event Action OnGameUnpaused;
+    public void GameUnpaused()
+    {
+        if (OnGameUnpaused != null) OnGameUnpaused();
+    }
 }

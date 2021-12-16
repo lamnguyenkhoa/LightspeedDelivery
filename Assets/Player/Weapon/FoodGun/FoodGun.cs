@@ -5,6 +5,7 @@ using UnityEngine.InputSystem;
 
 public class FoodGun : MonoBehaviour
 {
+    public EventsManager eventsManager;
     public MainInstances mainInstances;
     public PlayerStats playerStats;
     public GameObject foodGun;
@@ -17,13 +18,27 @@ public class FoodGun : MonoBehaviour
     GameControls gameControls;
 
     private void OnEnable() {
-        gameControls.Enable();
-        ActivateGun();
+        UnpauseGun();
+        eventsManager.OnGamePaused += PauseGun;
+        eventsManager.OnGameUnpaused += UnpauseGun;
     }
 
     private void OnDisable() {
+        eventsManager.OnGamePaused -= PauseGun;
+        eventsManager.OnGameUnpaused -= UnpauseGun;
+        PauseGun();
+    }
+
+    void PauseGun()
+    {
         DeactivateGun();
         gameControls.Disable();
+    }
+
+    void UnpauseGun()
+    {
+        gameControls.Enable();
+        ActivateGun();
     }
 
     public void ActivateGun()

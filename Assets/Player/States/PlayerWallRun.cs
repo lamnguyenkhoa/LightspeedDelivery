@@ -12,8 +12,10 @@ public class PlayerWallRun : PlayerState
     public float wallRunSpeed = 5;
     public float gravity = 8f;
     public float maxGravity = 2f;
-    public float cameraTilt = 0;
-    public float maxCameraTilt = 0;
+    public float tiltSmoothness = 5f;
+    public float maxCameraTilt = 30;
+    float targetCameraTilt = 0;
+    float cameraTilt = 0;
     bool runningRight = true;
 
     Vector3 motion = Vector3.zero;
@@ -39,7 +41,6 @@ public class PlayerWallRun : PlayerState
         motion.y = Mathf.Max(motion.y, -maxGravity);
 
         player.transform.eulerAngles = new Vector3(0, playerMotion.xRotation, 0);
-        mainCamera.transform.localEulerAngles = new Vector3(playerMotion.yRotation, 0, 0);
 
         playerStats.stamina -= staminaCost * Time.deltaTime;
         if (playerStats.stamina <= 0)
@@ -61,11 +62,13 @@ public class PlayerWallRun : PlayerState
         {
             motion += player.transform.right;
             runningRight = true;
+            targetCameraTilt = maxCameraTilt;
         }
         else
         {
             motion -= player.transform.right;
             runningRight = false;
+            targetCameraTilt = -maxCameraTilt;
         }
 
         CancelInvoke("RecoverStamina");
@@ -77,14 +80,20 @@ public class PlayerWallRun : PlayerState
         gameControls.Player.Jump.performed -= JumpPerformed;
 
         Invoke("RecoverStamina", recoverDelay);
+
+        targetCameraTilt = 0;
     }
 
     public void JumpPerformed(InputAction.CallbackContext ctx)
     {
         if (runningRight)
+        {
             playerMotion.motion.x = -wallRunSpeed;
+        }
         else
+        {
             playerMotion.motion.x = wallRunSpeed;
+        }
         
         fsm.TransitionTo<PlayerAir, bool>(true);
     }
@@ -93,6 +102,9 @@ public class PlayerWallRun : PlayerState
 
     void Update()
     {
+        cameraTilt = Mathf.MoveTowards(cameraTilt, targetCameraTilt, tiltSmoothness * Time.deltaTime);
+        mainCamera.transform.localEulerAngles = new Vector3(playerMotion.yRotation, 0, cameraTilt);
+        
         if (!recoverStamina) return;
         playerStats.stamina += recoverRate * Time.deltaTime;
         if (playerStats.stamina >= playerStats.maxStamina) recoverStamina = false;
