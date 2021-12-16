@@ -10,32 +10,34 @@ public class FoodGun : MonoBehaviour
     public PlayerStats playerStats;
     public GameObject foodGun;
     public FoodBag foodBag;
-    bool isCharging = false;
+    private bool isCharging = false;
 
     public float minShootForce = 5;
     public float forceRate = 20;
 
-    GameControls gameControls;
+    private GameControls gameControls;
 
-    private void OnEnable() {
+    private void OnEnable()
+    {
         UnpauseGun();
         eventsManager.OnGamePaused += PauseGun;
         eventsManager.OnGameUnpaused += UnpauseGun;
     }
 
-    private void OnDisable() {
+    private void OnDisable()
+    {
         eventsManager.OnGamePaused -= PauseGun;
         eventsManager.OnGameUnpaused -= UnpauseGun;
         PauseGun();
     }
 
-    void PauseGun()
+    private void PauseGun()
     {
         DeactivateGun();
         gameControls.Disable();
     }
 
-    void UnpauseGun()
+    private void UnpauseGun()
     {
         gameControls.Enable();
         ActivateGun();
@@ -53,12 +55,13 @@ public class FoodGun : MonoBehaviour
         gameControls.Player.Shoot.canceled -= ShootCanceled;
     }
 
-    private void Awake() {
+    private void Awake()
+    {
         gameControls = new GameControls();
         playerStats.foodbags = playerStats.orders;
     }
 
-    private void Update() 
+    private void Update()
     {
         if (isCharging)
         {
@@ -66,7 +69,7 @@ public class FoodGun : MonoBehaviour
         }
     }
 
-    void Shoot()
+    private void Shoot()
     {
         AudioManager.instance.PlayFoodSplat();
         FoodBag newFoodBag = Instantiate(foodBag, foodGun.transform.position, Quaternion.Euler(new Vector3(-90, 0, 0)));
@@ -77,23 +80,23 @@ public class FoodGun : MonoBehaviour
         playerStats.foodbags -= 1;
     }
 
-    void ShootPerformed(InputAction.CallbackContext ctx)
+    private void ShootPerformed(InputAction.CallbackContext ctx)
     {
         if (playerStats.foodbags > 0) SetCharging();
     }
 
-    void ShootCanceled(InputAction.CallbackContext ctx)
+    private void ShootCanceled(InputAction.CallbackContext ctx)
     {
-        if (playerStats.foodbags > 0) Shoot();
+        if (playerStats.foodbags > 0 && playerStats.shootForce >= minShootForce) Shoot();
         UnsetCharging();
     }
 
-    void SetCharging()
+    private void SetCharging()
     {
         isCharging = true;
     }
 
-    void UnsetCharging()
+    private void UnsetCharging()
     {
         playerStats.shootForce = 0;
         isCharging = false;

@@ -5,7 +5,7 @@ using UnityEngine.InputSystem;
 
 public class PlayerWallRun : PlayerState
 {
-    PlayerMotion playerMotion;
+    private PlayerMotion playerMotion;
     public float staminaCost = 75f;
     public float recoverRate = 125f;
     public float recoverDelay = 1.5f;
@@ -14,13 +14,14 @@ public class PlayerWallRun : PlayerState
     public float maxGravity = 2f;
     public float tiltSmoothness = 5f;
     public float maxCameraTilt = 30;
-    float targetCameraTilt = 0;
-    float cameraTilt = 0;
-    bool runningRight = true;
+    private float targetCameraTilt = 0;
+    private float cameraTilt = 0;
+    private bool runningRight = true;
 
-    Vector3 motion = Vector3.zero;
+    private Vector3 motion = Vector3.zero;
 
-    private void Awake() {
+    private void Awake()
+    {
         playerMotion = GetComponent<PlayerMotion>();
     }
 
@@ -94,23 +95,23 @@ public class PlayerWallRun : PlayerState
         {
             playerMotion.motion.x = wallRunSpeed;
         }
-        
+
         fsm.TransitionTo<PlayerAir, bool>(true);
     }
 
-    bool recoverStamina = false;
+    private bool recoverStamina = false;
 
-    void Update()
+    private void Update()
     {
         cameraTilt = Mathf.MoveTowards(cameraTilt, targetCameraTilt, tiltSmoothness * Time.deltaTime);
         mainCamera.transform.localEulerAngles = new Vector3(playerMotion.yRotation, 0, cameraTilt);
-        
+
         if (!recoverStamina) return;
         playerStats.stamina += recoverRate * Time.deltaTime;
         if (playerStats.stamina >= playerStats.maxStamina) recoverStamina = false;
     }
 
-    void RecoverStamina()
+    private void RecoverStamina()
     {
         recoverStamina = true;
     }

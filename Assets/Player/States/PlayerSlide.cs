@@ -5,17 +5,17 @@ using UnityEngine.InputSystem;
 
 public class PlayerSlide : PlayerState
 {
-    PlayerMotion playerMotion;
+    private PlayerMotion playerMotion;
     public float slideSpeed = 16f;
     public float slideAcceleration = 45f;
     public float slideTime = 1.5f;
     public float normalHeight = 2f;
     public float slideHeight = 0.7f;
     public float floorGravity = 2;
-    Vector3 slideDirection = Vector3.zero;
-    Vector3 motion = Vector3.zero;
+    private Vector3 slideDirection = Vector3.zero;
+    private Vector3 motion = Vector3.zero;
 
-    private void Awake() 
+    private void Awake()
     {
         playerMotion = GetComponent<PlayerMotion>();
     }
@@ -25,7 +25,7 @@ public class PlayerSlide : PlayerState
         motion += slideDirection * slideAcceleration * Time.deltaTime;
         motion = Vector3Ext.ClampPlaneAxis(motion, slideSpeed);
         controller.Move(motion * Time.deltaTime);
-        
+
         motion.y = -floorGravity;
 
         // if (!controller.isGrounded)
@@ -56,17 +56,17 @@ public class PlayerSlide : PlayerState
         CancelInvoke("SlideEnded");
     }
 
-    void JumpPerformed(InputAction.CallbackContext ctx)
+    private void JumpPerformed(InputAction.CallbackContext ctx)
     {
         fsm.TransitionTo<PlayerAir, bool>(true);
     }
 
-    void CancelSlide(InputAction.CallbackContext ctx)
+    private void CancelSlide(InputAction.CallbackContext ctx)
     {
         SlideEnded();
     }
 
-    void SlideEnded()
+    private void SlideEnded()
     {
         fsm.TransitionTo<PlayerGround>();
     }

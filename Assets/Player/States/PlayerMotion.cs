@@ -21,12 +21,12 @@ public class PlayerMotion : PlayerState
     [HideInInspector] public Vector3 motion = Vector3.zero;
     [HideInInspector] public Vector3 finalMove = Vector3.zero;
 
-    private void Awake() 
+    private void Awake()
     {
         playerDash = GetComponent<PlayerDash>();
     }
 
-    public override void _Update() 
+    public override void _Update()
     {
         moveDirection = gameControls.Player.Move.ReadValue<Vector2>();
 
@@ -39,9 +39,9 @@ public class PlayerMotion : PlayerState
             if (controller.isGrounded)
                 motion = Vector3.MoveTowards(motion, Vector3Ext.ClampPlaneAxis(motion, 0), decceleration * Time.deltaTime);
         }
-        
+
         motion = Vector3Ext.ClampPlaneAxis(motion, moveSpeed);
-        
+
         finalMove = motion.x * player.transform.right + motion.y * Vector3.up + motion.z * player.transform.forward;
 
         controller.Move(finalMove * Time.deltaTime);
@@ -77,7 +77,7 @@ public class PlayerMotion : PlayerState
         gameControls.Player.Dash.performed -= SetDash;
     }
 
-    void SetCameraDirection(InputAction.CallbackContext ctx)
+    private void SetCameraDirection(InputAction.CallbackContext ctx)
     {
         xRotation += ctx.ReadValue<Vector2>().x * mouseSensitivity;
         yRotation -= ctx.ReadValue<Vector2>().y * mouseSensitivity;
@@ -85,13 +85,13 @@ public class PlayerMotion : PlayerState
         yRotation = Mathf.Clamp(yRotation, -90, 90);
     }
 
-    void SetDash(InputAction.CallbackContext ctx)
+    private void SetDash(InputAction.CallbackContext ctx)
     {
         if (playerStats.power < playerDash.dashCost) return;
-        
+
         moveDirection = Vector2.zero;
         motion = Vector3.zero;
-        
+
         fsm.TransitionTo<PlayerDash>();
     }
 }

@@ -8,7 +8,8 @@ public class PlayerStats : ScriptableObject
     public int deliveredAmount = 0;
 
     public float maxShootForce = 30;
-    float _shootForce = 0;
+    private float _shootForce = 0;
+
     public float shootForce
     {
         get
@@ -23,12 +24,14 @@ public class PlayerStats : ScriptableObject
     }
 
     public event Action<float> OnShootForceChanged;
+
     public void ShootForceChanged(float amount)
     {
         if (OnShootForceChanged != null) OnShootForceChanged(amount);
     }
 
-    int _foodbags = 0;
+    private int _foodbags = 0;
+
     public int foodbags
     {
         get
@@ -43,6 +46,7 @@ public class PlayerStats : ScriptableObject
     }
 
     public event Action<int> OnFoodbagsChanged;
+
     public void FoodbagsChanged(int score)
     {
         if (OnFoodbagsChanged != null) OnFoodbagsChanged(score);
@@ -51,8 +55,9 @@ public class PlayerStats : ScriptableObject
     public bool restorePower = false;
     public float powerRecoverRate = 150f;
     public float maxPower = 100;
-    float _power = 0;
-    public float power 
+    private float _power = 0;
+
+    public float power
     {
         get
         {
@@ -66,14 +71,16 @@ public class PlayerStats : ScriptableObject
     }
 
     public event Action<float> OnPowerChanged;
+
     public void PowerChanged(float amount)
     {
         if (OnPowerChanged != null) OnPowerChanged(amount);
     }
 
     public float maxStamina = 100;
-    float _stamina = 100;
-    public float stamina 
+    private float _stamina = 100;
+
+    public float stamina
     {
         get
         {
@@ -87,6 +94,7 @@ public class PlayerStats : ScriptableObject
     }
 
     public event Action<float> OnStaminaChanged;
+
     public void StaminaChanged(float amount)
     {
         if (OnStaminaChanged != null) OnStaminaChanged(amount);

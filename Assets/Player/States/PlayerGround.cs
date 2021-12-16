@@ -5,25 +5,25 @@ using UnityEngine.InputSystem;
 
 public class PlayerGround : PlayerState
 {
-    PlayerMotion playerMotion;
+    private PlayerMotion playerMotion;
 
     public float runSpeed = 9f;
     public float sprintSpeed = 14f;
 
-    bool sprinting = false;
+    private bool sprinting = false;
 
-    private void Awake() 
+    private void Awake()
     {
         playerMotion = GetComponent<PlayerMotion>();
     }
 
-    public override void _Update() 
+    public override void _Update()
     {
         playerMotion._Update();
 
         anim.SetFloat("WalkForward", playerMotion.moveDirection.y, 1f, Time.deltaTime * 3f);
         anim.SetFloat("WalkRight", playerMotion.moveDirection.x, 1f, Time.deltaTime * 3f);
-        
+
         if (!controller.isGrounded)
         {
             fsm.TransitionTo<PlayerAir>();
@@ -33,7 +33,7 @@ public class PlayerGround : PlayerState
     public override void _Enter()
     {
         playerMotion._Enter();
-        
+
         playerMotion.moveSpeed = runSpeed;
         gameControls.Player.Jump.performed += JumpPerformed;
         gameControls.Player.Crouch.performed += CrouchPerformed;
@@ -55,7 +55,7 @@ public class PlayerGround : PlayerState
         playerMotion._Exit();
         gameControls.Player.Jump.performed -= JumpPerformed;
         gameControls.Player.Crouch.performed -= CrouchPerformed;
-        
+
         gameControls.Player.Sprint.performed -= SetSprint;
         gameControls.Player.Sprint.canceled -= CancelSprint;
     }
@@ -65,7 +65,7 @@ public class PlayerGround : PlayerState
         fsm.TransitionTo<PlayerAir, bool>(false);
     }
 
-    void CrouchPerformed(InputAction.CallbackContext ctx)
+    private void CrouchPerformed(InputAction.CallbackContext ctx)
     {
         if (sprinting)
             fsm.TransitionTo<PlayerSlide>();
@@ -73,24 +73,24 @@ public class PlayerGround : PlayerState
             fsm.TransitionTo<PlayerCrouch>();
     }
 
-    void SetSprint()
+    private void SetSprint()
     {
         sprinting = true;
         playerMotion.moveSpeed = sprintSpeed;
     }
 
-    void SetSprint(InputAction.CallbackContext ctx)
+    private void SetSprint(InputAction.CallbackContext ctx)
     {
         SetSprint();
     }
 
-    void CancelSprint()
+    private void CancelSprint()
     {
         sprinting = false;
         playerMotion.moveSpeed = runSpeed;
     }
 
-    void CancelSprint(InputAction.CallbackContext ctx)
+    private void CancelSprint(InputAction.CallbackContext ctx)
     {
         CancelSprint();
     }
