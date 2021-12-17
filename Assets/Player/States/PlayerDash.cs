@@ -4,28 +4,31 @@ using UnityEngine;
 
 public class PlayerDash : PlayerState
 {
-    PlayerMotion playerMotion;
+    private PlayerMotion playerMotion;
     public float dashCost = 50f;
     public float sunraySpeed = 50f;
     public float sunrayTime = 1.0f;
     public float detectionDistance = 1.5f;
     public float smoothRotation = 1000f;
-    public LayerMask layerMask;
-    Vector3 dashDirection = Vector3.zero;
+    public float timer;
+    public LayerMask mirrorMask;
+    private Vector3 dashDirection = Vector3.zero;
 
-    private void Awake() {
+    private void Awake()
+    {
         playerMotion = GetComponent<PlayerMotion>();
     }
 
     public override void _FixedUpdate()
     {
         RaycastHit hit;
-        if (Physics.Raycast(transform.position, dashDirection, out hit, detectionDistance, layerMask, QueryTriggerInteraction.Ignore))
+        if (Physics.Raycast(transform.position, dashDirection, out hit, detectionDistance, mirrorMask, QueryTriggerInteraction.Ignore))
         {
             AudioManager.instance.PlayDash();
             Vector3 reflectDirection = Vector3.Reflect(dashDirection, hit.normal);
             transform.position = hit.point;
             dashDirection = reflectDirection;
+            timer = sunrayTime;
         }
     }
 
@@ -47,30 +50,29 @@ public class PlayerDash : PlayerState
 
         player.transform.rotation = Quaternion.RotateTowards(player.transform.rotation, bodyRotation, smoothRotation * Time.deltaTime);
         mainCamera.transform.localRotation = Quaternion.RotateTowards(mainCamera.transform.localRotation, cameraRotation, smoothRotation * Time.deltaTime);
+        timer -= Time.deltaTime;
+        if (timer <= 0)
+        {
+            DashEnded();
+        }
     }
 
     public override void _Enter()
     {
         eventsManager.PlayerDashStarted();
-        
         dashDirection = mainCamera.transform.forward;
-
         playerStats.power -= dashCost;
-        Invoke("DashEnded", sunrayTime);
-        
         foodGun.DeactivateGun();
+        timer = sunrayTime;
     }
 
     public override void _Exit()
     {
         eventsManager.PlayerDashEnded();
-        
-        CancelInvoke("DashEnded");
-
         foodGun.ActivateGun();
     }
 
-    void DashEnded()
+    private void DashEnded()
     {
         fsm.TransitionTo<PlayerAir>();
     }

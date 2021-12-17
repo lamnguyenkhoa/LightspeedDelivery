@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.InputSystem;
 
+// PlayerMotion is continuous state, not transistioned into?
 public class PlayerMotion : PlayerState
 {
     public float cameraBobSmoothness = 20.0f;
@@ -14,12 +15,15 @@ public class PlayerMotion : PlayerState
     public float gravity = 9.8f;
     public float floorGravity = 2;
     public float maxGravity = 20f;
+    public LineRenderer aimRenderer;
 
     [HideInInspector] public Vector2 moveDirection = Vector2.zero;
     [HideInInspector] public float xRotation = 0;
     [HideInInspector] public float yRotation = 0;
     [HideInInspector] public Vector3 motion = Vector3.zero;
     [HideInInspector] public Vector3 finalMove = Vector3.zero;
+
+    private bool isAiming = false;
 
     private void Awake()
     {
@@ -63,18 +67,24 @@ public class PlayerMotion : PlayerState
         mainCamera.transform.position = Vector3.Lerp(mainCamera.transform.position, headPos.transform.position, cameraBobSmoothness * Time.deltaTime);
 
         anim.SetFloat("HeadLook", (yRotation + 90f) / 180f, 1f, Time.deltaTime * 10f);
+
+        RenderAiming();
     }
 
     public override void _Enter()
     {
         gameControls.Player.CameraMouse.performed += SetCameraDirection;
-        gameControls.Player.Dash.performed += SetDash;
+        gameControls.Player.Dash.performed += ActivateDashAim;
+        gameControls.Player.Dash.canceled += ReleaseDashAim;
+        gameControls.Player.Cancel.performed += CancelAim;
     }
 
     public override void _Exit()
     {
         gameControls.Player.CameraMouse.performed -= SetCameraDirection;
-        gameControls.Player.Dash.performed -= SetDash;
+        gameControls.Player.Dash.performed -= ActivateDashAim;
+        gameControls.Player.Dash.canceled -= ReleaseDashAim;
+        gameControls.Player.Cancel.performed -= CancelAim;
     }
 
     private void SetCameraDirection(InputAction.CallbackContext ctx)
@@ -85,13 +95,73 @@ public class PlayerMotion : PlayerState
         yRotation = Mathf.Clamp(yRotation, -90, 90);
     }
 
-    private void SetDash(InputAction.CallbackContext ctx)
+    private void CancelAim(InputAction.CallbackContext ctx)
     {
-        if (playerStats.power < playerDash.dashCost) return;
+        isAiming = false;
+        aimRenderer.positionCount = 0;
+    }
 
-        moveDirection = Vector2.zero;
-        motion = Vector3.zero;
+    private void ActivateDashAim(InputAction.CallbackContext ctx)
+    {
+        isAiming = true;
+    }
 
-        fsm.TransitionTo<PlayerDash>();
+    private void ReleaseDashAim(InputAction.CallbackContext ctx)
+    {
+        if (isAiming && playerStats.power >= playerDash.dashCost)
+        {
+            moveDirection = Vector2.zero;
+            motion = Vector3.zero;
+            fsm.TransitionTo<PlayerDash>();
+        }
+        isAiming = false;
+        aimRenderer.positionCount = 0;
+    }
+
+    private void RenderAiming()
+    {
+        if (isAiming)
+        {
+            List<Vector3> drawPoints = new List<Vector3>();
+            drawPoints.Add(aimRenderer.transform.position);
+            MirrorRaycast(mainCamera.transform.position, mainCamera.transform.forward, new List<GameObject>(), drawPoints);
+            aimRenderer.positionCount = drawPoints.Count;
+            aimRenderer.SetPositions(drawPoints.ToArray());
+        }
+    }
+
+    private void MirrorRaycast(Vector3 position, Vector3 direction, List<GameObject> bouncedMirror, List<Vector3> drawPoints)
+    {
+        Ray ray = new Ray(position, direction);
+        RaycastHit hit;
+        bool continueBounce = false;
+
+        if (Physics.Raycast(ray, out hit, playerDash.sunraySpeed * playerDash.sunrayTime, Physics.DefaultRaycastLayers, QueryTriggerInteraction.Ignore))
+        {
+            if (hit.collider.gameObject.tag == "Mirror")
+            {
+                if (!bouncedMirror.Contains(hit.collider.gameObject))
+                {
+                    direction = Vector3.Reflect(direction, hit.normal);
+                    position = hit.point;
+                    bouncedMirror.Add(hit.collider.gameObject);
+                    continueBounce = true;
+                }
+            }
+            else
+            {
+                position = hit.point;
+            }
+        }
+        else
+        {
+            position += direction * playerDash.sunraySpeed * playerDash.sunrayTime;
+        }
+        drawPoints.Add(position);
+
+        if (continueBounce)
+        {
+            MirrorRaycast(position, direction, bouncedMirror, drawPoints);
+        }
     }
 }
