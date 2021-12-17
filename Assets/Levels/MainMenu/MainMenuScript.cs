@@ -74,6 +74,11 @@ public class MainMenuScript : MonoBehaviour
         SceneManager.LoadScene("Freeplay");
     }
 
+    public void SkyscrapperLevelButton()
+    {
+        SceneManager.LoadScene("City2");
+    }
+
     public void ExitGameButton()
     {
         Application.Quit();

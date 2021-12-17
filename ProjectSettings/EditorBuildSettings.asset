@@ -9,12 +9,15 @@ EditorBuildSettings:
     path: Assets/Levels/MainMenu/MainMenu.unity
     guid: c83869a6c9dc4314693e36522af8c8f3
   - enabled: 1
-    path: Assets/Levels/Playgrounds/Tutorial.unity
+    path: Assets/Levels/Tutorial/Tutorial.unity
     guid: 6d38a50b0c9fc49499b6706a123e9d9a
   - enabled: 1
-    path: Assets/Levels/Playgrounds/CityTest.unity
+    path: Assets/Levels/CityTest/CityTest.unity
     guid: ee15978583b302248ba9d38f2c47a3f1
   - enabled: 1
     path: Assets/Levels/Freeplay/Freeplay.unity
     guid: 76a9d8b181b3b0544a1c8b2687dad800
+  - enabled: 1
+    path: Assets/Levels/City2/City2.unity
+    guid: c541dcd7fcb86ae4795676ddecf3a91a
   m_configObjects: {}

@@ -26,7 +26,7 @@ public class Mailbox : MonoBehaviour
         if (!delivered)
         {
             float distance = Vector3.Distance(player.position, transform.position);
-            if (distance > 250f)
+            if (distance <= 300f)
                 distanceText.text = distance.ToString("F0") + "m";
             else
                 distanceText.text = "";
