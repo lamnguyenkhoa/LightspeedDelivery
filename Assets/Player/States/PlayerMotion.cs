@@ -16,6 +16,7 @@ public class PlayerMotion : PlayerState
     public float floorGravity = 2;
     public float maxGravity = 20f;
     public LineRenderer aimRenderer;
+    public LayerMask glassLayer;
 
     [HideInInspector] public Vector2 moveDirection = Vector2.zero;
     [HideInInspector] public float xRotation = 0;
@@ -136,7 +137,7 @@ public class PlayerMotion : PlayerState
         RaycastHit hit;
         bool continueBounce = false;
 
-        if (Physics.Raycast(ray, out hit, playerDash.sunraySpeed * playerDash.sunrayTime, Physics.DefaultRaycastLayers, QueryTriggerInteraction.Ignore))
+        if (Physics.Raycast(ray, out hit, playerDash.sunraySpeed * playerDash.sunrayTime, ~glassLayer, QueryTriggerInteraction.Ignore))
         {
             if (hit.collider.gameObject.tag == "Mirror")
             {

@@ -2501,6 +2501,10 @@ MonoBehaviour:
   gravity: 30
   floorGravity: 2
   maxGravity: 100
+  aimRenderer: {fileID: 8506846801027605396}
+  glassLayer:
+    serializedVersion: 2
+    m_Bits: 1024
   moveDirection: {x: 0, y: 0}
   xRotation: 0
   yRotation: 0
@@ -2583,7 +2587,8 @@ MonoBehaviour:
   sunrayTime: 0.5
   detectionDistance: 1.5
   smoothRotation: 1000
-  layerMask:
+  timer: 0
+  mirrorMask:
     serializedVersion: 2
     m_Bits: 4096
 --- !u!114 &3909436350919302604
