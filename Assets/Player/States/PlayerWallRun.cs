@@ -54,9 +54,7 @@ public class PlayerWallRun : PlayerState
     {
         playerMotion._Enter();
         gameControls.Player.Jump.performed += JumpPerformed;
-
         motion = player.transform.forward * wallRunSpeed * gameControls.Player.Move.ReadValue<Vector2>().y;
-        motion.y = playerMotion.finalMove.y;
 
         if (wallRunRight.Equals(true))
         {

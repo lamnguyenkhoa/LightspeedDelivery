@@ -5,16 +5,16 @@ using UnityEngine.InputSystem;
 
 public class PlayerAir : PlayerState
 {
-    PlayerMotion playerMotion;
+    private PlayerMotion playerMotion;
 
     public float jumpHeight = 12f;
     public float coyoteMaxTime = 0.5f;
-    float coyoteTimeCount = 0;
+    private float coyoteTimeCount = 0;
 
     public float wallCheckTime = 1.0f;
-    bool checkWall = true;
+    private bool checkWall = true;
 
-    private void Awake() 
+    private void Awake()
     {
         playerMotion = GetComponent<PlayerMotion>();
     }
@@ -35,7 +35,7 @@ public class PlayerAir : PlayerState
     public override void _Update()
     {
         playerMotion._Update();
-        
+
         if (coyoteTimeCount <= coyoteMaxTime)
             coyoteTimeCount += Time.deltaTime;
 
@@ -50,7 +50,7 @@ public class PlayerAir : PlayerState
         playerMotion._Enter();
         gameControls.Player.Jump.performed += JumpPerformed;
         coyoteTimeCount = 0;
-        checkWall = false;
+        checkWall = true;
         anim.SetBool("isFalling", true);
     }
 
@@ -63,13 +63,14 @@ public class PlayerAir : PlayerState
         playerMotion.motion.y = 0;
         playerMotion.motion.y = jumpHeight;
 
-        if (fromWall.Equals(true))
-        {
-            checkWall = false;
-            Invoke("SetCheckWall", wallCheckTime);
-        }
-        else
-            checkWall = true;
+        //if (fromWall.Equals(true))
+        //{
+        //    checkWall = false;
+        //    Invoke("SetCheckWall", wallCheckTime);
+        //}
+        //else
+        //    checkWall = true;
+        checkWall = true;
 
         anim.SetTrigger("jump");
     }
@@ -87,7 +88,7 @@ public class PlayerAir : PlayerState
             fsm.TransitionTo<PlayerAir, bool>(false);
     }
 
-    void SetCheckWall()
+    private void SetCheckWall()
     {
         checkWall = true;
     }
