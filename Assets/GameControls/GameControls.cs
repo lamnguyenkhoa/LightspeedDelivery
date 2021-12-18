@@ -193,6 +193,17 @@ public class @GameControls : IInputActionCollection, IDisposable
                 },
                 {
                     ""name"": """",
+                    ""id"": ""05de4d2f-b5d6-4665-a3a7-b3cfa59a608c"",
+                    ""path"": ""<Keyboard>/c"",
+                    ""interactions"": """",
+                    ""processors"": """",
+                    ""groups"": """",
+                    ""action"": ""Crouch"",
+                    ""isComposite"": false,
+                    ""isPartOfComposite"": false
+                },
+                {
+                    ""name"": """",
                     ""id"": ""d27c9727-8985-403a-a37f-24122e7f4794"",
                     ""path"": ""<Mouse>/rightButton"",
                     ""interactions"": """",
