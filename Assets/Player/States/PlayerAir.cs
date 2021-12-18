@@ -11,7 +11,7 @@ public class PlayerAir : PlayerState
     public float coyoteMaxTime = 0.5f;
     private float coyoteTimeCount = 0;
 
-    public float wallCheckTime = 1.0f;
+    public float wallCheckTime = 0.25f;
     private bool checkWall = true;
 
     private void Awake()
@@ -63,14 +63,13 @@ public class PlayerAir : PlayerState
         playerMotion.motion.y = 0;
         playerMotion.motion.y = jumpHeight;
 
-        //if (fromWall.Equals(true))
-        //{
-        //    checkWall = false;
-        //    Invoke("SetCheckWall", wallCheckTime);
-        //}
-        //else
-        //    checkWall = true;
-        checkWall = true;
+        if (fromWall.Equals(true))
+        {
+            checkWall = false;
+            Invoke("SetCheckWall", wallCheckTime);
+        }
+        else
+            checkWall = true;
 
         anim.SetTrigger("jump");
     }
