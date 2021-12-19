@@ -4389,6 +4389,10 @@ PrefabInstance:
       propertyPath: m_CullingMask.m_Bits
       value: 8288
       objectReference: {fileID: 0}
+    - target: {fileID: 3202518695506482017, guid: 0bbdd7d867891ab489c426da921c62a9, type: 3}
+      propertyPath: wallCheckTime
+      value: 0.25
+      objectReference: {fileID: 0}
     - target: {fileID: 6537709387267488380, guid: 0bbdd7d867891ab489c426da921c62a9, type: 3}
       propertyPath: m_AnchoredPosition.x
       value: 0
