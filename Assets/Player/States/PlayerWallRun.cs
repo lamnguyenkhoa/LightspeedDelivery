@@ -9,7 +9,7 @@ public class PlayerWallRun : PlayerState
     public float staminaCost = 75f;
     public float recoverRate = 125f;
     public float recoverDelay = 1.5f;
-    public float wallRunSpeed = 5;
+    public float wallRunSpeed = 14f;
     public float gravity = 8f;
     public float maxGravity = 2f;
     public float tiltSmoothness = 5f;

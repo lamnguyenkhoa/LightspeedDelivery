@@ -10,8 +10,11 @@ public class PlayerMotion : PlayerState
     public PlayerDash playerDash;
     public float mouseSensitivity = 0.5f;
     public float acceleration = 15f;
-    public float decceleration = 20f;
-    public float moveSpeed = 9f;
+    public float brake = 15f;
+    public float decceleration = 30f;
+    public float moveSpeed = 14f;
+    public float runLimit = 10f;
+    public bool isSprinting = false;
     public float gravity = 9.8f;
     public float floorGravity = 2;
     public float maxGravity = 20f;
@@ -21,7 +24,7 @@ public class PlayerMotion : PlayerState
     [HideInInspector] public Vector2 moveDirection = Vector2.zero;
     [HideInInspector] public float xRotation = 0;
     [HideInInspector] public float yRotation = 0;
-    [HideInInspector] public Vector3 motion = Vector3.zero;
+    public Vector3 motion = Vector3.zero;
     [HideInInspector] public Vector3 finalMove = Vector3.zero;
 
     private bool isAiming = false;
@@ -38,6 +41,12 @@ public class PlayerMotion : PlayerState
         if (moveDirection != Vector2.zero)
         {
             motion += new Vector3(moveDirection.x, 0, moveDirection.y) * acceleration * Time.deltaTime;
+
+            // Extra brake force if go opposite direction
+            if (motion.x * moveDirection.x < 0)
+                motion += new Vector3(moveDirection.x, 0, 0) * brake * Time.deltaTime;
+            if (motion.z * moveDirection.y < 0)
+                motion += new Vector3(0, 0, moveDirection.y) * brake * Time.deltaTime;
         }
         else
         {
@@ -46,6 +55,15 @@ public class PlayerMotion : PlayerState
         }
 
         motion = Vector3Ext.ClampPlaneAxis(motion, moveSpeed);
+
+        if (motion.magnitude > runLimit)
+        {
+            isSprinting = true;
+        }
+        else
+        {
+            isSprinting = false;
+        }
 
         finalMove = motion.x * player.transform.right + motion.y * Vector3.up + motion.z * player.transform.forward;
 

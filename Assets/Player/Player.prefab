@@ -1259,7 +1259,7 @@ Camera:
   m_Depth: 0
   m_CullingMask:
     serializedVersion: 2
-    m_Bits: 8416
+    m_Bits: 8288
   m_RenderingPath: -1
   m_TargetTexture: {fileID: 0}
   m_TargetDisplay: 0
@@ -2468,7 +2468,7 @@ MonoBehaviour:
   controller: {fileID: 0}
   foodGun: {fileID: 0}
   anim: {fileID: 0}
-  runSpeed: 9
+  runSpeed: 14
   sprintSpeed: 14
 --- !u!114 &674770177536580126
 MonoBehaviour:
@@ -2495,7 +2495,8 @@ MonoBehaviour:
   cameraBobSmoothness: 20
   playerDash: {fileID: 0}
   mouseSensitivity: 0.2
-  acceleration: 30
+  acceleration: 10
+  brake: 20
   decceleration: 30
   moveSpeed: 10
   gravity: 30
@@ -2534,7 +2535,7 @@ MonoBehaviour:
   anim: {fileID: 0}
   jumpHeight: 12
   coyoteMaxTime: 0.2
-  wallCheckTime: 1
+  wallCheckTime: 0.25
 --- !u!114 &3125392923699713675
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -2976,7 +2977,7 @@ Camera:
   m_Depth: -1
   m_CullingMask:
     serializedVersion: 2
-    m_Bits: 4294967064
+    m_Bits: 4294967192
   m_RenderingPath: -1
   m_TargetTexture: {fileID: 0}
   m_TargetDisplay: 0

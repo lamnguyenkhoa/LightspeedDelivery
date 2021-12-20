@@ -4381,42 +4381,6 @@ PrefabInstance:
   m_Modification:
     m_TransformParent: {fileID: 0}
     m_Modifications:
-    - target: {fileID: 1997303425841329234, guid: 0bbdd7d867891ab489c426da921c62a9, type: 3}
-      propertyPath: staminaCost
-      value: 0
-      objectReference: {fileID: 0}
-    - target: {fileID: 2306891640129711269, guid: 0bbdd7d867891ab489c426da921c62a9, type: 3}
-      propertyPath: m_CullingMask.m_Bits
-      value: 8288
-      objectReference: {fileID: 0}
-    - target: {fileID: 3202518695506482017, guid: 0bbdd7d867891ab489c426da921c62a9, type: 3}
-      propertyPath: wallCheckTime
-      value: 0.25
-      objectReference: {fileID: 0}
-    - target: {fileID: 6537709387267488380, guid: 0bbdd7d867891ab489c426da921c62a9, type: 3}
-      propertyPath: m_AnchoredPosition.x
-      value: 0
-      objectReference: {fileID: 0}
-    - target: {fileID: 6537709387656783647, guid: 0bbdd7d867891ab489c426da921c62a9, type: 3}
-      propertyPath: m_AnchorMax.x
-      value: 0
-      objectReference: {fileID: 0}
-    - target: {fileID: 6537709387656783647, guid: 0bbdd7d867891ab489c426da921c62a9, type: 3}
-      propertyPath: m_AnchorMax.y
-      value: 0
-      objectReference: {fileID: 0}
-    - target: {fileID: 6537709387840815947, guid: 0bbdd7d867891ab489c426da921c62a9, type: 3}
-      propertyPath: m_AnchorMax.y
-      value: 0
-      objectReference: {fileID: 0}
-    - target: {fileID: 6537709388478863912, guid: 0bbdd7d867891ab489c426da921c62a9, type: 3}
-      propertyPath: m_AnchorMax.y
-      value: 0
-      objectReference: {fileID: 0}
-    - target: {fileID: 6537709388643306132, guid: 0bbdd7d867891ab489c426da921c62a9, type: 3}
-      propertyPath: m_AnchoredPosition.x
-      value: 0
-      objectReference: {fileID: 0}
     - target: {fileID: 8506846800919694611, guid: 0bbdd7d867891ab489c426da921c62a9, type: 3}
       propertyPath: m_Name
       value: PlayerLloyd
@@ -4464,10 +4428,6 @@ PrefabInstance:
     - target: {fileID: 8506846800919694614, guid: 0bbdd7d867891ab489c426da921c62a9, type: 3}
       propertyPath: m_LocalEulerAnglesHint.z
       value: 0
-      objectReference: {fileID: 0}
-    - target: {fileID: 8506846801711785073, guid: 0bbdd7d867891ab489c426da921c62a9, type: 3}
-      propertyPath: m_CullingMask.m_Bits
-      value: 4294967192
       objectReference: {fileID: 0}
     m_RemovedComponents: []
   m_SourcePrefab: {fileID: 100100000, guid: 0bbdd7d867891ab489c426da921c62a9, type: 3}

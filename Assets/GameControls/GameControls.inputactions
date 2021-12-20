@@ -46,14 +46,6 @@
                     "interactions": "Press(behavior=2)"
                 },
                 {
-                    "name": "Sprint",
-                    "type": "PassThrough",
-                    "id": "7d8a6302-c4e0-4bf3-80d3-40aca7ddab7c",
-                    "expectedControlType": "Button",
-                    "processors": "",
-                    "interactions": "Press(behavior=2)"
-                },
-                {
                     "name": "Crouch",
                     "type": "PassThrough",
                     "id": "65506ae6-54dc-4b8e-a622-51ee2b525340",
@@ -153,17 +145,6 @@
                     "processors": "",
                     "groups": "",
                     "action": "Jump",
-                    "isComposite": false,
-                    "isPartOfComposite": false
-                },
-                {
-                    "name": "",
-                    "id": "23944dd1-7d24-4254-ba12-08df8e2d4aa5",
-                    "path": "<Keyboard>/shift",
-                    "interactions": "",
-                    "processors": "",
-                    "groups": "",
-                    "action": "Sprint",
                     "isComposite": false,
                     "isPartOfComposite": false
                 },
