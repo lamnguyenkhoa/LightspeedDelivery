@@ -93,6 +93,21 @@ public class PlayerStats : ScriptableObject
         }
     }
 
+    [Header("Setting")]
+    [SerializeField] private float _mouseSensitivity = 0.5f;
+
+    public float mouseSensitivity
+    {
+        get
+        {
+            return _mouseSensitivity;
+        }
+        set
+        {
+            _mouseSensitivity = Mathf.Clamp(value, 0.1f, 1f);
+        }
+    }
+
     public event Action<float> OnStaminaChanged;
 
     public void StaminaChanged(float amount)

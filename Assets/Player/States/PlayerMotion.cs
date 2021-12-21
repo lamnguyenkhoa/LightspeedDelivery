@@ -8,7 +8,6 @@ public class PlayerMotion : PlayerState
 {
     public float cameraBobSmoothness = 20.0f;
     public PlayerDash playerDash;
-    public float mouseSensitivity = 0.5f;
     public float acceleration = 15f;
     public float brake = 15f;
     public float decceleration = 30f;
@@ -108,8 +107,8 @@ public class PlayerMotion : PlayerState
 
     private void SetCameraDirection(InputAction.CallbackContext ctx)
     {
-        xRotation += ctx.ReadValue<Vector2>().x * mouseSensitivity;
-        yRotation -= ctx.ReadValue<Vector2>().y * mouseSensitivity;
+        xRotation += ctx.ReadValue<Vector2>().x * playerStats.mouseSensitivity;
+        yRotation -= ctx.ReadValue<Vector2>().y * playerStats.mouseSensitivity;
 
         yRotation = Mathf.Clamp(yRotation, -90, 90);
     }

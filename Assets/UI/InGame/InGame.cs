@@ -17,10 +17,11 @@ public class InGame : MonoBehaviour
     public Slider shootForceSlider;
 
     public GameObject pauseMenu;
-    bool isPaused = false;
-    GameControls gameControls;
+    public Slider mouseSensitivitySlider;
+    private bool isPaused = false;
+    private GameControls gameControls;
 
-    private void Awake() 
+    private void Awake()
     {
         staminaSlider.maxValue = playerStats.maxStamina;
         powerSlider.maxValue = playerStats.maxPower;
@@ -28,7 +29,7 @@ public class InGame : MonoBehaviour
         gameControls = new GameControls();
     }
 
-    private void Start() 
+    private void Start()
     {
         SetStamina(playerStats.stamina);
         SetPower(playerStats.power);
@@ -37,11 +38,11 @@ public class InGame : MonoBehaviour
         SetFoodbagText(playerStats.foodbags);
 
         SetShootForce(0);
-        
+
         Unpause();
     }
 
-    private void OnEnable() 
+    private void OnEnable()
     {
         gameControls.Enable();
         gameControls.Menu.Pause.performed += PausePerformed;
@@ -56,7 +57,7 @@ public class InGame : MonoBehaviour
         playerStats.OnShootForceChanged += SetShootForce;
     }
 
-    private void OnDisable() 
+    private void OnDisable()
     {
         gameControls.Disable();
         gameControls.Menu.Pause.performed -= PausePerformed;
@@ -71,32 +72,32 @@ public class InGame : MonoBehaviour
         playerStats.OnShootForceChanged -= SetShootForce;
     }
 
-    void SetDeliveredText()
+    private void SetDeliveredText()
     {
         deliveredText.text = "Delivered: " + playerStats.deliveredAmount.ToString() + "/" + playerStats.orders.ToString();
     }
 
-    void SetFoodbagText(int amount)
+    private void SetFoodbagText(int amount)
     {
         foodBagLeftText.text = "Food bags lefg: " + amount.ToString();
     }
 
-    void SetStamina(float amount)
+    private void SetStamina(float amount)
     {
         staminaSlider.value = amount;
     }
 
-    void SetPower(float amount)
+    private void SetPower(float amount)
     {
         powerSlider.value = amount;
     }
 
-    void SetShootForce(float amount)
+    private void SetShootForce(float amount)
     {
         shootForceSlider.value = amount / playerStats.maxShootForce;
     }
 
-    void PausePerformed(InputAction.CallbackContext ctx)
+    private void PausePerformed(InputAction.CallbackContext ctx)
     {
         if (!isPaused)
         {
@@ -112,6 +113,7 @@ public class InGame : MonoBehaviour
     {
         isPaused = true;
         pauseMenu.SetActive(true);
+        mouseSensitivitySlider.value = playerStats.mouseSensitivity;
         Time.timeScale = 0f;
         Cursor.lockState = CursorLockMode.None;
         eventsManager.GamePaused();
@@ -131,5 +133,10 @@ public class InGame : MonoBehaviour
         Time.timeScale = 1f;
         isPaused = false;
         SceneManager.LoadScene("MainMenu");
+    }
+
+    public void UpdateMouseSensitivity()
+    {
+        playerStats.mouseSensitivity = mouseSensitivitySlider.value;
     }
 }
