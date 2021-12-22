@@ -27,11 +27,13 @@ public class PlayerSlide : PlayerState
         controller.Move(motion * Time.deltaTime);
 
         motion.y = -floorGravity;
+        mainCamera.transform.position = Vector3.Lerp(mainCamera.transform.position,
+            headPos.transform.position, playerMotion.cameraBobSmoothness * Time.deltaTime);
 
-        // if (!controller.isGrounded)
-        // {
-        //     fsm.TransitionTo<PlayerAir>();
-        // }
+        if (controller.height != slideHeight)
+        {
+            controller.height = Mathf.Lerp(controller.height, slideHeight, 0.1f);
+        }
     }
 
     public override void _Enter()
@@ -39,11 +41,13 @@ public class PlayerSlide : PlayerState
         gameControls.Player.Jump.performed += JumpPerformed;
         gameControls.Player.Crouch.canceled += CancelSlide;
 
-        controller.height = slideHeight;
         motion = playerMotion.finalMove;
         slideDirection = player.transform.forward;
+        anim.SetTrigger("slide");
+        anim.SetBool("isStanding", false);
 
         Invoke("SlideEnded", slideTime);
+        player.model.localPosition = new Vector3(0, -0.7f, 0);
     }
 
     public override void _Exit()
@@ -51,9 +55,8 @@ public class PlayerSlide : PlayerState
         gameControls.Player.Jump.performed -= JumpPerformed;
         gameControls.Player.Crouch.canceled -= CancelSlide;
 
-        controller.height = normalHeight;
-
         CancelInvoke("SlideEnded");
+        player.model.localPosition = new Vector3(0, -1, 0);
     }
 
     private void JumpPerformed(InputAction.CallbackContext ctx)

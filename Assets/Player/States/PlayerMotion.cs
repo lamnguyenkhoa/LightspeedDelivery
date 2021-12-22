@@ -11,6 +11,7 @@ public class PlayerMotion : PlayerState
     public float acceleration = 15f;
     public float brake = 15f;
     public float decceleration = 30f;
+    public float normalSpeed = 14f;
     public float moveSpeed = 14f;
     public float runLimit = 10f;
     public bool isSprinting = false;

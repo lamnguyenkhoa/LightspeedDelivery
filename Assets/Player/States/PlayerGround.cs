@@ -6,6 +6,7 @@ using UnityEngine.InputSystem;
 public class PlayerGround : PlayerState
 {
     private PlayerMotion playerMotion;
+    public float standHeight = 2f;
 
     private void Awake()
     {
@@ -23,17 +24,24 @@ public class PlayerGround : PlayerState
         {
             fsm.TransitionTo<PlayerAir>();
         }
+
+        if (controller.height != standHeight)
+        {
+            controller.height = Mathf.Lerp(controller.height, standHeight, 0.1f);
+        }
     }
 
     public override void _Enter()
     {
         playerMotion._Enter();
-
+        playerMotion.moveSpeed = playerMotion.normalSpeed;
         gameControls.Player.Jump.performed += JumpPerformed;
         gameControls.Player.Crouch.performed += CrouchPerformed;
 
         anim.ResetTrigger("jump");
+        anim.ResetTrigger("slide");
         anim.SetBool("isFalling", false);
+        anim.SetBool("isStanding", true);
     }
 
     public override void _Exit()

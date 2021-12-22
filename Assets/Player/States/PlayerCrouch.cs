@@ -5,12 +5,12 @@ using UnityEngine.InputSystem;
 
 public class PlayerCrouch : PlayerState
 {
-    PlayerMotion playerMotion;
+    private PlayerMotion playerMotion;
     public float crouchSpeed = 5f;
     public float normalHeight = 2f;
     public float crouchHeight = 1f;
 
-    private void Awake() 
+    private void Awake()
     {
         playerMotion = GetComponent<PlayerMotion>();
     }
@@ -18,28 +18,28 @@ public class PlayerCrouch : PlayerState
     public override void _Update()
     {
         playerMotion._Update();
+        if (controller.height != crouchHeight)
+        {
+            controller.height = Mathf.Lerp(controller.height, crouchHeight, 0.1f);
+            Debug.Log(crouchHeight);
+        }
     }
 
     public override void _Enter()
     {
         playerMotion._Enter();
         playerMotion.moveSpeed = crouchSpeed;
-        gameControls.Player.Jump.performed += StandUp;
-        gameControls.Player.Crouch.performed += StandUp;
-
-        controller.height = crouchHeight;
+        gameControls.Player.Crouch.canceled += StandUp;
+        anim.SetBool("isStanding", false);
     }
 
     public override void _Exit()
     {
         playerMotion._Exit();
-        gameControls.Player.Jump.performed -= StandUp;
-        gameControls.Player.Crouch.performed -= StandUp;
-
-        controller.height = normalHeight;
+        gameControls.Player.Crouch.canceled -= StandUp;
     }
 
-    void StandUp(InputAction.CallbackContext ctx)
+    private void StandUp(InputAction.CallbackContext ctx)
     {
         fsm.TransitionTo<PlayerGround>();
     }
