@@ -17,9 +17,6 @@ public class PlayerGround : PlayerState
     {
         playerMotion._Update();
 
-        anim.SetFloat("WalkForward", playerMotion.moveDirection.y, 1f, Time.deltaTime * 3f);
-        anim.SetFloat("WalkRight", playerMotion.moveDirection.x, 1f, Time.deltaTime * 3f);
-
         if (!controller.isGrounded)
         {
             fsm.TransitionTo<PlayerAir>();

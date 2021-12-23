@@ -31,12 +31,15 @@ public class PlayerCrouch : PlayerState
         playerMotion.moveSpeed = crouchSpeed;
         gameControls.Player.Crouch.canceled += StandUp;
         anim.SetBool("isStanding", false);
+        player.model.localPosition = new Vector3(0, -0.5f, 0);
     }
 
     public override void _Exit()
     {
         playerMotion._Exit();
         gameControls.Player.Crouch.canceled -= StandUp;
+        anim.SetBool("isStanding", true);
+        player.model.localPosition = new Vector3(0, -1, 0);
     }
 
     private void StandUp(InputAction.CallbackContext ctx)

@@ -85,6 +85,8 @@ public class PlayerMotion : PlayerState
 
         mainCamera.transform.position = Vector3.Lerp(mainCamera.transform.position, headPos.transform.position, cameraBobSmoothness * Time.deltaTime);
 
+        anim.SetFloat("WalkForward", moveDirection.y, 1f, Time.deltaTime * 3f);
+        anim.SetFloat("WalkRight", moveDirection.x, 1f, Time.deltaTime * 3f);
         anim.SetFloat("HeadLook", (yRotation + 90f) / 180f, 1f, Time.deltaTime * 10f);
 
         RenderAiming();
