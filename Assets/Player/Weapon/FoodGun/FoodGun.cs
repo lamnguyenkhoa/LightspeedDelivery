@@ -87,7 +87,11 @@ public class FoodGun : MonoBehaviour
 
     private void ShootCanceled(InputAction.CallbackContext ctx)
     {
-        if (playerStats.foodbags > 0 && playerStats.shootForce >= minShootForce) Shoot();
+        if (playerStats.foodbags > 0 && playerStats.shootForce >= minShootForce)
+        {
+            Shoot();
+            AudioManager.instance.PlayGunRepressurise();
+        }
         UnsetCharging();
     }
 

@@ -11,6 +11,8 @@ public class AudioManager : MonoBehaviour
     public AudioSource foodSplatSpeaker;
     public AudioSource landingSpeaker;
     public AudioSource dashSpeaker;
+    public AudioSource gunRepressurise;
+    public AudioSource foodDelivered;
 
     public AudioClip[] footstepClips;
 
@@ -64,5 +66,23 @@ public class AudioManager : MonoBehaviour
         dashSpeaker.pitch = randomPitch;
         dashSpeaker.volume = randomVolume;
         dashSpeaker.Play();
+    }
+
+    public void PlayGunRepressurise()
+    {
+        float randomPitch = Random.Range(0.8f, 1.2f);
+        float randomVolume = Random.Range(0.8f, 1f);
+        gunRepressurise.pitch = randomPitch;
+        gunRepressurise.volume = randomVolume;
+        gunRepressurise.Play();
+    }
+
+    public void PlayFoodDelivered()
+    {
+        float randomPitch = Random.Range(0.8f, 1.2f);
+        float randomVolume = Random.Range(0.8f, 1f);
+        foodDelivered.pitch = randomPitch;
+        foodDelivered.volume = randomVolume;
+        foodDelivered.Play();
     }
 }

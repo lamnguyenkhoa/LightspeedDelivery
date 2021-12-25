@@ -44,6 +44,7 @@ public class Mailbox : MonoBehaviour
 
         if (other.GetComponent<FoodBag>())
         {
+            AudioManager.instance.PlayFoodDelivered();
             delivered = true;
             FoodDelivered();
             // LevelManager.instance.player.deliveredAmount += 1;
