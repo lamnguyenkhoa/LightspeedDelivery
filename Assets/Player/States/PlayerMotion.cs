@@ -41,6 +41,11 @@ public class PlayerMotion : PlayerState
         if (moveDirection != Vector2.zero)
         {
             motion += new Vector3(moveDirection.x, 0, moveDirection.y) * acceleration * Time.deltaTime;
+            // Prevent player slippery if holding A/D when just hold W/S
+            if (moveDirection.x == 0)
+                motion += new Vector3(-motion.x, 0, 0) * brake * Time.deltaTime;
+            if (moveDirection.y == 0)
+                motion += new Vector3(0, 0, -motion.z) * brake * Time.deltaTime;
 
             // Extra brake force if go opposite direction
             if (motion.x * moveDirection.x < 0)
