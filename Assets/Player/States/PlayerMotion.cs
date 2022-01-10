@@ -133,6 +133,7 @@ public class PlayerMotion : PlayerState
         {
             moveDirection = Vector2.zero;
             motion = Vector3.zero;
+            AudioManager.instance.PlayDash();
             fsm.TransitionTo<PlayerDash>();
         }
         isAiming = false;

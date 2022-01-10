@@ -13,6 +13,7 @@ public class Mailbox : MonoBehaviour
     private Transform player;
     private Vector3 baseScale;
     public float scaleFactor = 0.01f;
+    public Animator anim;
 
     private void Start()
     {
@@ -44,6 +45,7 @@ public class Mailbox : MonoBehaviour
 
         if (other.GetComponent<FoodBag>())
         {
+            anim.SetTrigger("received");
             AudioManager.instance.PlayFoodDelivered();
             delivered = true;
             FoodDelivered();
